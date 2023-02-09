@@ -1,0 +1,260 @@
+.poems {
+  padding-bottom: 50px;
+}
+
+.poem {
+  padding: 0px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid black;
+  border-radius: 10px;
+  margin: 0px 10px;
+  margin-bottom: 60px;
+}
+
+.poem-description {
+  padding-left: 20px;
+  padding-right: 10px;
+}
+
+.poem-title {
+  padding: 10px 0px;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 3px;
+}
+.poem-containing {
+  padding-bottom: 20px;
+}
+.text {
+  letter-spacing: 0.7px;
+  line-height: 1.6;
+  font-size: 16px;
+  padding: 10px 0px;
+}
+.read-more {
+  color: rgb(82, 82, 82);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.likes {
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.likes img {
+  cursor: pointer;
+}
+
+.likes p {
+  padding-left: 5px;
+}
+
+.poem-buttons {
+  padding: 10px 0px;
+  padding-right: 10px;
+  padding-left: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.poem-buttons input {
+  cursor: pointer;
+  width: 128px;
+  height: 48px;
+  color: white;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 10px;
+  background-color: black;
+  margin: 5px;
+}
+
+@media (max-width: 1000px) {
+}
+
+@media (max-width: 850px) {
+  .poem-title {
+    font-size: 23px;
+    font-weight: 500;
+  }
+
+  .poem-buttons input {
+    width: 108px;
+    height: 38px;
+    margin: 2px;
+  }
+
+  .text {
+    font-size: 15px;
+  }
+  .likes {
+    padding-top: 17px;
+  }
+}
+
+@media (max-width: 620px) {
+  .poem {
+    flex-direction: column;
+    align-items: self-start;
+  }
+  .poem-title {
+    font-size: 23px;
+    font-weight: 500;
+  }
+
+  .poem-description {
+    padding: 15px;
+  }
+  .poem-buttons {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 15px;
+  }
+
+  .poem-containing {
+    padding-bottom: 10px;
+  }
+  .likes {
+    padding-top: 14px;
+  }
+  .poem-buttons input {
+    width: 108px;
+    height: 38px;
+    margin: 2px;
+  }
+
+  .text {
+    font-size: 15px;
+  }
+  .likes {
+    padding-top: 17px;
+  }
+}
+
+@media (max-width: 500px) {
+  .poems {
+    padding-bottom: 20px;
+  }
+  .poem {
+    flex-direction: column;
+  }
+
+  .poem-title {
+    font-size: 20px;
+  }
+
+  .poem-description {
+    padding: 14px;
+  }
+  .poem-buttons {
+    padding: 5px;
+  }
+
+  .poem-containing {
+    padding-bottom: 10px;
+  }
+  .likes {
+    padding-top: 14px;
+  }
+  .poem-buttons input {
+    width: 88px;
+    height: 33px;
+    margin: 2px;
+    font-size: 12px;
+  }
+
+  .text {
+    font-size: 14px;
+  }
+  .likes {
+    padding-top: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 620px) {
+  .poem {
+    flex-direction: column;
+    align-items: self-start;
+  }
+  .poem-title {
+    font-size: 23px;
+    font-weight: 500;
+  }
+
+  .poem-description {
+    padding: 10px;
+  }
+  .poem-buttons {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px;
+  }
+
+  .poem-containing {
+    padding-bottom: 10px;
+  }
+  .likes {
+    padding-top: 14px;
+  }
+  .poem-buttons input {
+    width: 108px;
+    height: 38px;
+    margin: 2px;
+  }
+
+  .text {
+    font-size: 15px;
+  }
+  .likes {
+    padding-top: 17px;
+  }
+}
+
+@media (max-width: 423px) {
+  .poem-buttons {
+    width: 100%;
+    padding-left: 0px;
+    padding-right: 5px;
+    display: block;
+  }
+
+  .poem-description {
+    padding: 10px 2px;
+  }
+  .poem-buttons input {
+    width: 95%;
+    margin: 2px 2px;
+    font-size: 13px;
+  }
+
+  .refactor-poem {
+    display: flex;
+    justify-content: center;
+  }
+  .delete-poem {
+    display: flex;
+    justify-content: center;
+  }
+  .hide-poem {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.refactor-poem {
+}
+.delete-poem {
+}
+.hide-poem {
+}

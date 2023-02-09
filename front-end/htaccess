@@ -1,0 +1,39 @@
+ErrorDocument 403 /404.html
+ErrorDocument 404 /404.html
+
+DirectoryIndex page33717319.html
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} /robots.txt
+RewriteCond "%{DOCUMENT_ROOT}/robots_%{HTTP_HOST}.txt" -f
+RewriteRule ^(.*)$ robots_%{HTTP_HOST}.txt [NC,L]
+RewriteRule ^registration$ page33718406.html [NC]
+RewriteRule ^registration/$ page33718406.html [NC]
+
+RewriteRule ^auth$ page33718575.html [NC]
+RewriteRule ^auth/$ page33718575.html [NC]
+
+RewriteRule ^account$ page33718639.html [NC]
+RewriteRule ^account/$ page33718639.html [NC]
+
+RewriteRule ^g-account$ page33725257.html [NC]
+RewriteRule ^g-account/$ page33725257.html [NC]
+
+RewriteRule ^users$ page33726375.html [NC]
+RewriteRule ^users/$ page33726375.html [NC]
+
+RewriteRule ^my-poem$ page33726431.html [NC]
+RewriteRule ^my-poem/$ page33726431.html [NC]
+
+RewriteRule ^refactor-poem$ page33732951.html [NC]
+RewriteRule ^refactor-poem/$ page33732951.html [NC]
+
+RewriteRule ^one-poem$ page33733421.html [NC]
+RewriteRule ^one-poem/$ page33733421.html [NC]
+
+RewriteRule ^create-poem$ page33733498.html [NC]
+RewriteRule ^create-poem/$ page33733498.html [NC]
+
+RewriteRule ^favicon.ico$ https://static.tildacdn.com/img/tildafavicon.ico [R=302,L]
+

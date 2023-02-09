@@ -1,0 +1,15 @@
+.tn-elem__5459095221675427732054 {
+  margin-left: 5px;
+}
+
+@media (max-width: 960px) {
+  .tn-elem__5459095221675427732054 {
+    margin-left: 0px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tn-elem__5459095221675427732054 {
+    margin-left: 0px;
+  }
+}
