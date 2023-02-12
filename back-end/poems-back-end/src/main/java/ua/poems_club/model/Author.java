@@ -27,10 +27,9 @@ public class Author {
     @Column(nullable = false,unique = true)
     private String fullName;
 
-    @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false)
     private String imageUrl;
 
     @Column(nullable = false,unique = true)

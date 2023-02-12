@@ -20,6 +20,9 @@ public interface AuthorRepository extends JpaRepository<Author,Long> {
             " from Author a left join a.subscribers subscribe" +
             " left join a.subscriptions subscrip left join a.myLikes l" +
             " left join a.poems p where a.id=?1 group by a")
-
     Optional<AuthorDto> findAuthorById(Long id);
+
+    Optional<Author> findAuthorByEmail(String email);
+    Optional<Author> findAuthorByFullName(String fullName);
+
 }

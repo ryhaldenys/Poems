@@ -1,5 +1,6 @@
 package ua.poems_club.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -111,5 +112,26 @@ public class AuthorControllerTest {
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(NotFoundException.class)
                 );
+    }
+
+    @Test
+    @SneakyThrows
+    void saveAuthorTest(){
+        var author = authors.get(0);
+        mockMvc.perform(post("/api/authors")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(author)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
+                        .isEqualTo("http://localhost/api/authors/"+author.getId())
+                );
+    }
+
+
+    @SneakyThrows
+    private String mapObjectToString(Author author){
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(author);
     }
 }

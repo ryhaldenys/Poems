@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.dto.AuthorDto;
 import ua.poems_club.dto.AuthorsDto;
+import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.NotFoundException;
+import ua.poems_club.model.Author;
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.service.AuthorService;
 
@@ -39,4 +41,35 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.findAuthorById(id).
                 orElseThrow(()-> new NotFoundException("Cannot find an author by id: "+id));
     }
+
+    @Override
+    @Transactional
+    public Author createAuthor(Author author) {
+        return create(author);
+    }
+
+    private Author create(Author author){
+        checkAuthorIsExist(author);
+        return authorRepository.save(author);
+    }
+
+    private void checkAuthorIsExist(Author author) {
+        checkIsAuthorByEmail(author.getEmail());
+        checkIsAuthorByFullName(author.getFullName());
+    }
+
+    private void checkIsAuthorByEmail(String email){
+        if (authorRepository.findAuthorByEmail(email).isPresent()){
+            throw new AuthorAlreadyExist("Author with this email already exist");
+        }
+    }
+
+    private void checkIsAuthorByFullName(String fullName){
+        if (authorRepository.findAuthorByFullName(fullName).isPresent()){
+            throw new AuthorAlreadyExist("Author with this first name and last name already exist");
+        }
+    }
+
+    //todo: add b2 encoding
+    //todo: default img
 }
