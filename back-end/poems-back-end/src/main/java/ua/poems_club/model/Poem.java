@@ -2,6 +2,7 @@ package ua.poems_club.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "poem",indexes = @Index(name="poem_author_id_idx",columnList = "author_id"))
 public class Poem {
@@ -37,6 +39,15 @@ public class Poem {
     inverseJoinColumns = @JoinColumn(name="user_id"))
     private List<Author> likes = new ArrayList<>();
 
+    public void addAuthor(Author author){
+        this.author = author;
+        author.getPoems().add(this);
+    }
+
+    public void addAllLikes(List<Author> likes){
+        this.likes = likes;
+        likes.forEach(l->l.getMyLikes().add(this));
+    }
 
     @Override
     public boolean equals(Object o) {

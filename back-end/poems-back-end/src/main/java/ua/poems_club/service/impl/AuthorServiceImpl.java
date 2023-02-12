@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.poems_club.dto.AuthorDto;
 import ua.poems_club.dto.AuthorsDto;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.repository.AuthorRepository;
@@ -27,5 +28,15 @@ public class AuthorServiceImpl implements AuthorService {
             throw new NotFoundException("Cannot find any authors");
         }
         return authors;
+    }
+
+    @Override
+    public AuthorDto getAuthorById(Long id) {
+        return getById(id);
+    }
+
+    private AuthorDto getById(Long id){
+        return authorRepository.findAuthorById(id).
+                orElseThrow(()-> new NotFoundException("Cannot find an author by id: "+id));
     }
 }
