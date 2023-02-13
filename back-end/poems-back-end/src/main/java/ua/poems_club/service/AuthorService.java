@@ -11,4 +11,6 @@ public interface AuthorService {
     Long createAuthor(CreateAuthorDto author);
     void updateAuthor(Long id, UpdateAuthorDto author);
     void updateAuthorPassword(Long id, PasswordDto password);
+
+    Author deleteAuthor(Long id);
 }

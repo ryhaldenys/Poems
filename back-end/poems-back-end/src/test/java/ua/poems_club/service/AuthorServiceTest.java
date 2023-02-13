@@ -1,17 +1,14 @@
 package ua.poems_club.service;
 
 import lombok.RequiredArgsConstructor;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import ua.poems_club.builder.AuthorBuilder;
 import ua.poems_club.dto.CreateAuthorDto;
 import ua.poems_club.dto.PasswordDto;
 import ua.poems_club.dto.UpdateAuthorDto;
@@ -163,6 +160,18 @@ public class AuthorServiceTest {
         assertThat(foundAuthor.getPassword())
                 .isEqualTo(password.newPassword());
     }
+
+    @Test
+    void deleteAuthorTest(){
+        var author = authors.get(0);
+
+        authorService.deleteAuthor(author.getId());
+        authorRepository.flush();
+
+        boolean isAuthor = authorRepository.findById(author.getId()).isPresent();
+        assertThat(isAuthor).isFalse();
+    }
+
 
     @AfterEach
     void tearDown() {

@@ -219,6 +219,26 @@ public class AuthorControllerTest {
                 );
     }
 
+    @Test
+    @SneakyThrows
+    void deleteAuthorTest(){
+        var author = authors.get(0);
+
+        when(service.deleteAuthor(author.getId()))
+                .thenReturn(author);
+
+        when(service.deleteAuthor(1L)).thenReturn(author);
+
+        mockMvc.perform(delete("/api/authors/1")
+                        .contentType(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName",is(author.getFullName())))
+                .andExpect(jsonPath("$.email",is(author.getEmail())));
+    }
+
+
+
 
     @SneakyThrows
     private<T> String mapObjectToString(T author){

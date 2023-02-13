@@ -132,6 +132,18 @@ public class AuthorServiceImpl implements AuthorService {
     private NotFoundException throwNotFoundAuthorById(Long id){
         return new NotFoundException("Cannot find an author by id: "+id);
     }
+
+    @Override
+    @Transactional
+    public Author deleteAuthor(Long id) {
+        var author = getAuthor(id);
+        removeAuthor(id);
+        return author;
+    }
+
+    private void removeAuthor(Long id) {
+        authorRepository.deleteById(id);
+    }
 }
 
 
