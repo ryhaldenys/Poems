@@ -23,7 +23,7 @@ public class Author {
     @GeneratedValue
     private Long id;
 
-    @NaturalId
+    @NaturalId(mutable = true)
     @Column(nullable = false,unique = true)
     private String fullName;
 

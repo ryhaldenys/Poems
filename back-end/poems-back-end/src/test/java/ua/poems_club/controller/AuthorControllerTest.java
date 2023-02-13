@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.poems_club.dto.AuthorDto;
 import ua.poems_club.dto.AuthorsDto;
 
+import ua.poems_club.dto.CreateAuthorDto;
+import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.NotFoundException;
 
 import ua.poems_club.generator.AuthorGenerator;
@@ -118,9 +120,10 @@ public class AuthorControllerTest {
     @SneakyThrows
     void saveAuthorTest(){
         var author = authors.get(0);
+        var authorDto = new CreateAuthorDto(author.getFullName(), author.getEmail(), author.getPassword());
         mockMvc.perform(post("/api/authors")
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(author)))
+                        .content(mapObjectToString(authorDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
@@ -128,9 +131,41 @@ public class AuthorControllerTest {
                 );
     }
 
+    @Test
+    @SneakyThrows
+    void saveUserWithEmailWhichAlreadyExist(){
+        var author = authors.get(2);
+        var authorDto = new CreateAuthorDto(author.getFullName(), author.getEmail(), author.getPassword());
+        when(service.createAuthor(authorDto))
+                .thenThrow(AuthorAlreadyExist.class);
+
+        mockMvc.perform(put("/api/authors/"+author.getId())
+                        .contentType(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertThat(result.getResolvedException())
+                        .isInstanceOf(AuthorAlreadyExist.class)
+                );
+    }
+
+    @Test
+    @SneakyThrows
+    void updateUserTest(){
+        var author = authors.get(2);
+
+        mockMvc.perform(put("/api/authors/"+author.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(author)))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
+                        .isEqualTo("http://localhost/api/authors/"+author.getId())
+                );
+    }
+
 
     @SneakyThrows
-    private String mapObjectToString(Author author){
+    private<T> String mapObjectToString(T author){
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(author);
     }

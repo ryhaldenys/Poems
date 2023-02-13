@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import ua.poems_club.builder.AuthorBuilder;
+import ua.poems_club.dto.CreateAuthorDto;
+import ua.poems_club.dto.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.generator.AuthorGenerator;
@@ -72,9 +74,7 @@ public class AuthorServiceTest {
 
     @Test
     void createAccountTest(){
-        var newAuthor = AuthorBuilder.builder().fullName("Mock full name").password("mockpassword")
-                .email("mockemail@gmail.com").description("description")
-                .imageUrl("url").build();
+        var newAuthor = new CreateAuthorDto("fullName","email","new");
 
         var savedAuthor = authorService.createAuthor(newAuthor);
 
@@ -83,24 +83,66 @@ public class AuthorServiceTest {
 
     @Test
     void createAccountWithEmailWhichAlreadyExistTest(){
-        var newAuthor = AuthorBuilder.builder().fullName("Mock full name").password("mockpassword")
-                .email(authors.get(0).getEmail()).description("description")
-                .imageUrl("url").build();
+        var email = authors.get(0).getEmail();
+        var newAuthor = new CreateAuthorDto("fullName",email,"new");
 
         assertThatThrownBy(()->authorService.createAuthor(newAuthor))
                 .isInstanceOf(AuthorAlreadyExist.class)
-                .hasMessage("Author with this email already exist");
+                .hasMessage("Author with email: "+email+", already exist");
     }
 
     @Test
     void createAccountWithFullNameWhichAlreadyExistTest(){
-        var newAuthor = AuthorBuilder.builder().fullName(authors.get(0).getFullName()).password("mockpassword")
-                .email("mockemail@gmail.com").description("description")
-                .imageUrl("url").build();
+        var fullName = authors.get(0).getFullName();
+        var newAuthor = new CreateAuthorDto(fullName,"new","new");
 
         assertThatThrownBy(()->authorService.createAuthor(newAuthor))
                 .isInstanceOf(AuthorAlreadyExist.class)
-                .hasMessage("Author with this first name and last name already exist");
+                .hasMessage("Author with full name: "+fullName+", already exist");
+    }
+
+
+    @Test
+    void updateAuthorTest(){
+        var id = authors.get(0).getId();
+        var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello");
+        authorService.updateAuthor(id,updateAuthorDto);
+
+        var author = authorRepository.findById(id)
+                .orElseThrow();
+
+        assertThat(author.getFullName()).isEqualTo(updateAuthorDto.fullName());
+        assertThat(author.getEmail()).isEqualTo(updateAuthorDto.email());
+        assertThat(author.getDescription()).isEqualTo(updateAuthorDto.description());
+    }
+
+    @Test
+    void updateAbsentAuthorTest(){
+        var id = 121312423L;
+        var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello");
+
+        assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void updateUserWithEmailWhichAlreadyExistTest(){
+        var id = authors.get(0).getId();
+        var email = authors.get(1).getEmail();
+        var updateAuthorDto = new UpdateAuthorDto("Denys Denys",email,"hello");
+
+        assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
+                .isInstanceOf(AuthorAlreadyExist.class);
+    }
+
+    @Test
+    void updateUserWithFullNameWhichAlreadyExistTest(){
+        var id = authors.get(0).getId();
+        var fullName = authors.get(1).getFullName();
+        var updateAuthorDto = new UpdateAuthorDto(fullName,"new@gmail.com","hello");
+
+        assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
+                .isInstanceOf(AuthorAlreadyExist.class);
     }
 
 

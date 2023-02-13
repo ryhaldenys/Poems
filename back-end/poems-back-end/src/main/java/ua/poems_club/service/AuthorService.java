@@ -4,10 +4,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ua.poems_club.dto.AuthorDto;
 import ua.poems_club.dto.AuthorsDto;
+import ua.poems_club.dto.CreateAuthorDto;
+import ua.poems_club.dto.UpdateAuthorDto;
 import ua.poems_club.model.Author;
 
 public interface AuthorService {
     Page<AuthorsDto> getAllAuthors(Pageable pageable);
     AuthorDto getAuthorById(Long id);
-    Author createAuthor(Author author);
+    Author createAuthor(CreateAuthorDto author);
+    void updateAuthor(Long id, UpdateAuthorDto author);
 }

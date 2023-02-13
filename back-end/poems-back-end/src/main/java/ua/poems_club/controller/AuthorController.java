@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.poems_club.dto.AuthorDto;
 import ua.poems_club.dto.AuthorsDto;
+import ua.poems_club.dto.CreateAuthorDto;
+import ua.poems_club.dto.UpdateAuthorDto;
 import ua.poems_club.model.Author;
 import ua.poems_club.service.AuthorService;
 
@@ -31,14 +33,26 @@ public class AuthorController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody Author author){
+    public ResponseEntity<?> createAccount(@RequestBody CreateAuthorDto author){
 
-        authorService.createAuthor(author);
+        var createdAuthor = authorService.createAuthor(author);
 
         var uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path("/{id}").buildAndExpand(author.getId()).toUri();
+                .path("/{id}").buildAndExpand(createdAuthor.getId()).toUri();
 
         return ResponseEntity.status(CREATED)
+                .location(uri)
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateAuthor(@PathVariable Long id, @RequestBody UpdateAuthorDto author){
+        authorService.updateAuthor(id,author);
+
+        var uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                .build().toUri();
+
+        return ResponseEntity.status(NO_CONTENT)
                 .location(uri)
                 .build();
     }

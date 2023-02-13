@@ -22,7 +22,7 @@ public interface AuthorRepository extends JpaRepository<Author,Long> {
             " left join a.poems p where a.id=?1 group by a")
     Optional<AuthorDto> findAuthorById(Long id);
 
-    Optional<Author> findAuthorByEmail(String email);
-    Optional<Author> findAuthorByFullName(String fullName);
+    Optional<Author> findByEmail(String email);
+    Optional<Author> findByFullName(String fullName);
 
 }
