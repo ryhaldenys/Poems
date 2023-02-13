@@ -6,11 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.builder.AuthorBuilder;
-import ua.poems_club.dto.AuthorDto;
-import ua.poems_club.dto.AuthorsDto;
-import ua.poems_club.dto.CreateAuthorDto;
-import ua.poems_club.dto.UpdateAuthorDto;
+import ua.poems_club.dto.*;
 import ua.poems_club.exception.AuthorAlreadyExist;
+import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.repository.AuthorRepository;
@@ -42,19 +40,20 @@ public class AuthorServiceImpl implements AuthorService {
 
     private AuthorDto getById(Long id){
         return authorRepository.findAuthorById(id).
-                orElseThrow(()-> new NotFoundException("Cannot find an author by id: "+id));
+                orElseThrow(()->throwNotFoundAuthorById(id));
     }
 
     @Override
     @Transactional
-    public Author createAuthor(CreateAuthorDto author) {
+    public Long createAuthor(CreateAuthorDto author) {
         return create(author);
     }
 
-    private Author create(CreateAuthorDto authorDto){
+    private Long create(CreateAuthorDto authorDto){
         var author = buildAuthor(authorDto);
         checkAuthorIsExist(author);
-        return authorRepository.save(author);
+        authorRepository.save(author);
+        return author.getId();
     }
 
     private Author buildAuthor(CreateAuthorDto authorDto){
@@ -100,7 +99,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     private Author getAuthor(Long id) {
         return authorRepository.findById(id)
-                .orElseThrow(()->new NotFoundException("Cannot find author by id: "+id));
+                .orElseThrow(()->throwNotFoundAuthorById(id));
 
     }
 
@@ -110,6 +109,29 @@ public class AuthorServiceImpl implements AuthorService {
         foundAuthor.setDescription(author.description());
     }
 
+    @Override
+    @Transactional
+    public void updateAuthorPassword(Long id, PasswordDto password) {
+        var author = getAuthor(id);
+        updateAuthorPassword(author,password);
+    }
+
+    private void updateAuthorPassword(Author author, PasswordDto password) {
+        checkIfOldPasswordIsCorrect(author.getPassword(), password.oldPassword());
+        author.setPassword(password.newPassword());
+    }
+
+    private void checkIfOldPasswordIsCorrect(String authorPassword,String oldPassword){
+        //todo:encodepassword;
+        if (!authorPassword.equals(oldPassword)){
+            throw new IncorrectAuthorDetailsException("Entered old password does not equal user password");
+        }
+    }
+
+
+    private NotFoundException throwNotFoundAuthorById(Long id){
+        return new NotFoundException("Cannot find an author by id: "+id);
+    }
 }
 
 

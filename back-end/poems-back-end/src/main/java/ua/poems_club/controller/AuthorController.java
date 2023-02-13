@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.poems_club.dto.AuthorDto;
-import ua.poems_club.dto.AuthorsDto;
-import ua.poems_club.dto.CreateAuthorDto;
-import ua.poems_club.dto.UpdateAuthorDto;
+import ua.poems_club.dto.*;
 import ua.poems_club.model.Author;
 import ua.poems_club.service.AuthorService;
 
@@ -35,10 +32,10 @@ public class AuthorController {
     @PostMapping
     public ResponseEntity<?> createAccount(@RequestBody CreateAuthorDto author){
 
-        var createdAuthor = authorService.createAuthor(author);
+        var authorId = authorService.createAuthor(author);
 
         var uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path("/{id}").buildAndExpand(createdAuthor.getId()).toUri();
+                .path("/{id}").buildAndExpand(authorId).toUri();
 
         return ResponseEntity.status(CREATED)
                 .location(uri)
@@ -57,4 +54,18 @@ public class AuthorController {
                 .build();
     }
 
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody PasswordDto password){
+        authorService.updateAuthorPassword(id,password);
+        var uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                .build().toUri();
+
+        return ResponseEntity.status(NO_CONTENT)
+                .location(uri)
+                .build();
+    }
+
 }
+
+

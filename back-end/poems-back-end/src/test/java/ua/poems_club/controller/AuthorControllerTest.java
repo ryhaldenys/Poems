@@ -6,17 +6,17 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.test.web.servlet.MockMvc;
 
-import ua.poems_club.dto.AuthorDto;
-import ua.poems_club.dto.AuthorsDto;
+import ua.poems_club.dto.*;
 
-import ua.poems_club.dto.CreateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
+import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.NotFoundException;
 
 import ua.poems_club.generator.AuthorGenerator;
@@ -133,14 +133,15 @@ public class AuthorControllerTest {
 
     @Test
     @SneakyThrows
-    void saveUserWithEmailWhichAlreadyExist(){
+    void saveAuthorWithEmailWhichAlreadyExist(){
         var author = authors.get(2);
         var authorDto = new CreateAuthorDto(author.getFullName(), author.getEmail(), author.getPassword());
         when(service.createAuthor(authorDto))
                 .thenThrow(AuthorAlreadyExist.class);
 
-        mockMvc.perform(put("/api/authors/"+author.getId())
-                        .contentType(APPLICATION_JSON))
+        mockMvc.perform(post("/api/authors")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(authorDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
@@ -150,7 +151,7 @@ public class AuthorControllerTest {
 
     @Test
     @SneakyThrows
-    void updateUserTest(){
+    void updateAuthorTest(){
         var author = authors.get(2);
 
         mockMvc.perform(put("/api/authors/"+author.getId())
@@ -159,7 +160,62 @@ public class AuthorControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
+                        .isEqualTo("http://localhost/api/authors/0")
+                );
+    }
+
+    @Test
+    @SneakyThrows
+    void updateAuthorWithFullNameWhichAlreadyExist(){
+        var author = authors.get(2);
+        var authorDto = new UpdateAuthorDto(author.getFullName(), author.getEmail(), author.getDescription());
+
+        BDDMockito.willThrow(AuthorAlreadyExist.class).given(service).updateAuthor(author.getId(),authorDto);
+
+        mockMvc.perform(put("/api/authors/"+author.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(authorDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertThat(result.getResolvedException())
+                        .isInstanceOf(AuthorAlreadyExist.class)
+                );
+    }
+
+
+    @Test
+    @SneakyThrows
+    void updateAuthorPasswordTest(){
+        var author = authors.get(2);
+
+        var password = new PasswordDto("old","new");
+
+        mockMvc.perform(patch("/api/authors/"+author.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(password)))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
                         .isEqualTo("http://localhost/api/authors/"+author.getId())
+                );
+    }
+
+    @Test
+    @SneakyThrows
+    void updateAuthorPasswordWithWrongOldIdTest(){
+        var author = authors.get(2);
+
+        var password = new PasswordDto("old","new");
+
+        BDDMockito.willThrow(IncorrectAuthorDetailsException.class).given(service).updateAuthorPassword(author.getId(),password);
+
+        mockMvc.perform(patch("/api/authors/"+author.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(password)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertThat(result.getResolvedException())
+                        .isInstanceOf(IncorrectAuthorDetailsException.class)
                 );
     }
 

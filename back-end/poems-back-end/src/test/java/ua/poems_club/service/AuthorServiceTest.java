@@ -8,9 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 import ua.poems_club.builder.AuthorBuilder;
 import ua.poems_club.dto.CreateAuthorDto;
+import ua.poems_club.dto.PasswordDto;
 import ua.poems_club.dto.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.NotFoundException;
@@ -24,6 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor
+@ActiveProfiles(profiles = "test")
 public class AuthorServiceTest {
     @Autowired
     private AuthorService authorService;
@@ -76,9 +80,10 @@ public class AuthorServiceTest {
     void createAccountTest(){
         var newAuthor = new CreateAuthorDto("fullName","email","new");
 
-        var savedAuthor = authorService.createAuthor(newAuthor);
+        var authorId = authorService.createAuthor(newAuthor);
 
-        assertThat(savedAuthor.getId()).isNotNull();
+        System.out.println(authorId);
+        assertThat(authorId).isNotNull();
     }
 
     @Test
@@ -146,6 +151,18 @@ public class AuthorServiceTest {
     }
 
 
+    @Test
+    void updatePasswordTest(){
+        var author = authors.get(1);
+        var password = new PasswordDto(author.getPassword(),"newpassword");
+        authorService.updateAuthorPassword(author.getId(),password);
+
+        var foundAuthor = authorRepository.findById(author.getId())
+                        .orElseThrow();
+
+        assertThat(foundAuthor.getPassword())
+                .isEqualTo(password.newPassword());
+    }
 
     @AfterEach
     void tearDown() {
