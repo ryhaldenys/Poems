@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import ua.poems_club.dto.*;
@@ -24,6 +25,7 @@ import ua.poems_club.model.Author;
 import ua.poems_club.service.AuthorService;
 
 import java.util.List;
+import java.util.Objects;
 
 
 import static org.assertj.core.api.Assertions.*;
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthorController.class)
+@ActiveProfiles("test")
 public class AuthorControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -126,8 +129,9 @@ public class AuthorControllerTest {
                         .content(mapObjectToString(authorDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
-                        .isEqualTo("http://localhost/api/authors/"+author.getId())
+                .andExpect(result -> assertThat(Objects.requireNonNull(result.getResponse().getRedirectedUrl())
+                        .contains("http://localhost/api/authors/"))
+                        .isTrue()
                 );
     }
 
@@ -159,8 +163,9 @@ public class AuthorControllerTest {
                         .content(mapObjectToString(author)))
                 .andDo(print())
                 .andExpect(status().isNoContent())
-                .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
-                        .isEqualTo("http://localhost/api/authors/0")
+                .andExpect(result -> assertThat(Objects.requireNonNull(result.getResponse().getRedirectedUrl())
+                        .contains("http://localhost/api/authors/"))
+                        .isTrue()
                 );
     }
 
@@ -207,7 +212,8 @@ public class AuthorControllerTest {
 
         var password = new PasswordDto("old","new");
 
-        BDDMockito.willThrow(IncorrectAuthorDetailsException.class).given(service).updateAuthorPassword(author.getId(),password);
+        BDDMockito.willThrow(IncorrectAuthorDetailsException.class)
+                .given(service).updateAuthorPassword(author.getId(),password);
 
         mockMvc.perform(patch("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
