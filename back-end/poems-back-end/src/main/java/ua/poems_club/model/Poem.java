@@ -10,6 +10,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.*;
+
 
 @Getter
 @Setter
@@ -29,11 +31,11 @@ public class Poem {
     private String text;
 
     @JsonIgnore
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = LAZY)
     @JoinColumn(name = "author_id")
     private Author author;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinTable(name = "poem_likes",
     joinColumns = @JoinColumn(name = "poem_id"),
     inverseJoinColumns = @JoinColumn(name="user_id"))

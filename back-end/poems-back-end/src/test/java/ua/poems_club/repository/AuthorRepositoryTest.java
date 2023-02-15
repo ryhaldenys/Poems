@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import org.springframework.data.domain.Pageable;
-import ua.poems_club.dto.AuthorsDto;
+import ua.poems_club.dto.author.AuthorsDto;
 import ua.poems_club.model.Author;
 
 
@@ -37,7 +37,7 @@ public class AuthorRepositoryTest {
         var authorsPage = authorRepository.findAllAuthors(pageable);
         var authors = authorsPage.getContent();
         AuthorsDto authorsDto = new AuthorsDto(author.getId(),author.getFullName(),author.getDescription(), author.getImageUrl(),
-                (long)author.getSubscribers().size(), (long)author.getPoems().size());
+                (long)author.getSubscribers().size(), (long)author.getPoems().size(),false);
 
         assertThat(authors.get(0)).isEqualTo(authorsDto);
     }

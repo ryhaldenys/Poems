@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.builder.AuthorBuilder;
-import ua.poems_club.dto.*;
+import ua.poems_club.dto.author.*;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.NotFoundException;

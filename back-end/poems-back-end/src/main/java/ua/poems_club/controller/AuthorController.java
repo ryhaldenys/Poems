@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.poems_club.dto.*;
+import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
 import ua.poems_club.service.AuthorService;
 

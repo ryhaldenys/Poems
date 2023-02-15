@@ -57,7 +57,7 @@ public class Author {
     private List<Poem> poems = new ArrayList<>();
 
     @Setter(AccessLevel.PRIVATE)
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinTable(name = "user_subscribers",
         joinColumns = @JoinColumn(name = "channel_id"),
         inverseJoinColumns = @JoinColumn(name = "subscriber_id")
@@ -65,14 +65,15 @@ public class Author {
     private List<Author> subscribers = new ArrayList<>();
 
     @Setter(AccessLevel.PRIVATE)
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinTable(name = "user_subscribers",
             joinColumns = @JoinColumn(name = "subscriber_id"),
             inverseJoinColumns = @JoinColumn(name = "channel_id")
     )
     private List<Author> subscriptions = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinTable(name = "poem_likes",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name="poem_id"))

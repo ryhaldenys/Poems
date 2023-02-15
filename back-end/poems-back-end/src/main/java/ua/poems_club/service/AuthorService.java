@@ -2,7 +2,7 @@ package ua.poems_club.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ua.poems_club.dto.*;
+import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
 
 public interface AuthorService {
@@ -11,6 +11,5 @@ public interface AuthorService {
     Long createAuthor(CreateAuthorDto author);
     void updateAuthor(Long id, UpdateAuthorDto author);
     void updateAuthorPassword(Long id, PasswordDto password);
-
     Author deleteAuthor(Long id);
 }

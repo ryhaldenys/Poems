@@ -14,8 +14,7 @@ import org.springframework.data.domain.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import ua.poems_club.dto.*;
-
+import ua.poems_club.dto.author.*;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.NotFoundException;
@@ -56,7 +55,7 @@ public class AuthorControllerTest {
     @Test
     void getAllAuthorsTest(){
         var authorsDtos = authors.stream().map(a -> new AuthorsDto(a.getId(),a.getFullName(),a.getDescription()
-                ,a.getImageUrl(), (long) a.getSubscribers().size(), (long) a.getPoems().size()))
+                ,a.getImageUrl(), (long) a.getSubscribers().size(), (long) a.getPoems().size(),false))
                 .toList();
 
         Page<AuthorsDto> page = new PageImpl<>(authorsDtos);

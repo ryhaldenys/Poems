@@ -10,7 +10,6 @@ public class PoemBuilder {
     private Long id;
     private String name;
     private String text;
-    private Author author;
     private final List<Author> likes = new ArrayList<>();
 
     public static PoemBuilder builder(){
@@ -30,10 +29,7 @@ public class PoemBuilder {
         this.text = text;
         return this;
     }
-    public PoemBuilder author(Author author){
-        this.author = author;
-        return this;
-    }
+
     public PoemBuilder like(Author like){
         this.likes.add(like);
         return this;
@@ -48,7 +44,7 @@ public class PoemBuilder {
         poem.setId(id);
         poem.setName(name);
         poem.setText(text);
-        poem.addAuthor(author);
+        //poem.addAuthor(author);
         poem.addAllLikes(likes);
         return poem;
     }

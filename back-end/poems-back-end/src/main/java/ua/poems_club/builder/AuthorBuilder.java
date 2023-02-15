@@ -102,10 +102,6 @@ public class AuthorBuilder {
         author.setPassword(password);
         author.setRole(role);
         author.setStatus(status);
-        author.addAllPoems(poems);
-        author.addAllSubscribers(subscribers);
-        author.addAllSubscriptions(subscriptions);
-        author.addAllLikes(myLikes);
         return author;
     }
 }
