@@ -7,10 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static jakarta.persistence.FetchType.*;
+import static java.time.LocalDateTime.*;
 
 
 @Getter
@@ -30,6 +33,9 @@ public class Poem {
     @Column(nullable = false)
     private String text;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt = now();
+
     @JsonIgnore
     @ManyToOne(optional = false,fetch = LAZY)
     @JoinColumn(name = "author_id")
@@ -39,14 +45,14 @@ public class Poem {
     @JoinTable(name = "poem_likes",
     joinColumns = @JoinColumn(name = "poem_id"),
     inverseJoinColumns = @JoinColumn(name="user_id"))
-    private List<Author> likes = new ArrayList<>();
+    private Set<Author> likes = new HashSet<>();
 
     public void addAuthor(Author author){
         this.author = author;
         author.getPoems().add(this);
     }
 
-    public void addAllLikes(List<Author> likes){
+    public void addAllLikes(Set<Author> likes){
         this.likes = likes;
         likes.forEach(l->l.getMyLikes().add(this));
     }

@@ -3,15 +3,18 @@ package ua.poems_club.builder;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.time.LocalDateTime.*;
 
 public class PoemBuilder {
     private Long id;
     private String name;
     private String text;
-    private final List<Author> likes = new ArrayList<>();
-
+    private final Set<Author> likes = new HashSet<>();
+    private LocalDateTime createdAt = now();
     public static PoemBuilder builder(){
         return new PoemBuilder();
     }
@@ -30,8 +33,8 @@ public class PoemBuilder {
         return this;
     }
 
-    public PoemBuilder like(Author like){
-        this.likes.add(like);
+    public PoemBuilder createdAt(LocalDateTime createdAt){
+        this.createdAt = createdAt;
         return this;
     }
 
@@ -40,13 +43,7 @@ public class PoemBuilder {
     }
 
     private Poem initializePoem(){
-        var poem = new Poem();
-        poem.setId(id);
-        poem.setName(name);
-        poem.setText(text);
-        //poem.addAuthor(author);
-        poem.addAllLikes(likes);
-        return poem;
+        return new Poem(id,name,text,createdAt,null,likes);
     }
 
 }

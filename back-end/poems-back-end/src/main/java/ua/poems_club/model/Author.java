@@ -4,9 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static java.time.LocalDateTime.*;
 import static ua.poems_club.model.Author.Role.USER;
 import static ua.poems_club.model.Author.Status.*;
 
@@ -17,6 +21,7 @@ import static ua.poems_club.model.Author.Status.*;
 @Entity
 @EqualsAndHashCode(of = "email")
 @Table(name = "author")
+@ToString(of = "fullName")
 public class Author {
 
     @Id
@@ -38,6 +43,9 @@ public class Author {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt = now();
+
     @Enumerated(EnumType.STRING)
     private Role role = USER;
 
@@ -57,12 +65,8 @@ public class Author {
     private List<Poem> poems = new ArrayList<>();
 
     @Setter(AccessLevel.PRIVATE)
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
-    @JoinTable(name = "user_subscribers",
-        joinColumns = @JoinColumn(name = "channel_id"),
-        inverseJoinColumns = @JoinColumn(name = "subscriber_id")
-    )
-    private List<Author> subscribers = new ArrayList<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "subscriptions")
+    private Set<Author> subscribers = new HashSet<>();
 
     @Setter(AccessLevel.PRIVATE)
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
@@ -70,14 +74,11 @@ public class Author {
             joinColumns = @JoinColumn(name = "subscriber_id"),
             inverseJoinColumns = @JoinColumn(name = "channel_id")
     )
-    private List<Author> subscriptions = new ArrayList<>();
+    private Set<Author> subscriptions = new HashSet<>();
 
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
-    @JoinTable(name = "poem_likes",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name="poem_id"))
-    private List<Poem> myLikes = new ArrayList<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "likes")
+    private Set<Poem> myLikes = new HashSet<>();
 
     public void addPoem(Poem poem){
         poems.add(poem);
@@ -94,7 +95,7 @@ public class Author {
         author.getSubscriptions().add(this);
     }
 
-    public void addAllSubscribers(List<Author>subscribers){
+    public void addAllSubscribers(Set<Author>subscribers){
         this.subscribers = subscribers;
         subscribers.forEach(s->s.getSubscriptions().add(this));
     }
@@ -105,14 +106,19 @@ public class Author {
     }
 
 
-    public void addAllSubscriptions(List<Author>subscriptions){
+    public void addAllSubscriptions(Set<Author>subscriptions){
         this.subscriptions = subscriptions;
         subscribers.forEach(s->s.getSubscribers().add(this));
     }
 
-    public void addAllLikes(List<Poem>likes){
+    public void addAllLikes(Set<Poem>likes){
         this.myLikes = likes;
         likes.forEach(l->l.getLikes().add(this));
+    }
+
+    public void addLike(Poem like){
+        this.myLikes.add(like);
+        like.getLikes().add(this);
     }
 
 }

@@ -3,8 +3,11 @@ package ua.poems_club.builder;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static ua.poems_club.model.Author.Role.USER;
 import static ua.poems_club.model.Author.Status.ACTIVE;
@@ -19,9 +22,11 @@ public class AuthorBuilder {
     private Author.Role role = USER;
     private Author.Status status = ACTIVE;
     private final List<Poem> poems = new ArrayList<>();
-    private final List<Author> subscribers = new ArrayList<>();
-    private final List<Author> subscriptions = new ArrayList<>();
-    private final List<Poem> myLikes = new ArrayList<>();
+    private final Set<Author> subscribers = new HashSet<>();
+    private final Set<Author> subscriptions = new HashSet<>();
+    private final Set<Poem> myLikes = new HashSet<>();
+    private LocalDateTime createdAt = LocalDateTime.now();
+
 
     public static AuthorBuilder builder(){
         return new AuthorBuilder();
@@ -54,6 +59,11 @@ public class AuthorBuilder {
 
     public AuthorBuilder password(String password){
         this.password = password;
+        return this;
+    }
+
+    public AuthorBuilder createdAt(LocalDateTime createdAt){
+        this.createdAt = createdAt;
         return this;
     }
 
@@ -93,15 +103,7 @@ public class AuthorBuilder {
 
 
     private Author initializeAuthor(){
-        var author = new Author();
-        author.setId(id);
-        author.setFullName(fullName);
-        author.setDescription(description);
-        author.setImageUrl(imageUrl);
-        author.setEmail(email);
-        author.setPassword(password);
-        author.setRole(role);
-        author.setStatus(status);
-        return author;
+        return new Author(id,fullName,description,imageUrl,email,password,
+                createdAt,role,status,poems,subscribers,subscriptions,myLikes);
     }
 }

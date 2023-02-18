@@ -15,8 +15,6 @@ import java.util.Optional;
 
 public interface PoemRepository extends JpaRepository<Poem,Long> {
 
-    @QueryHints(
-            @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
     @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,a.fullName,count(l) ,false) " +
             "from Poem p join p.author a left join p.likes l " +
             "group by p.id,a.fullName")
@@ -25,7 +23,7 @@ public interface PoemRepository extends JpaRepository<Poem,Long> {
     @QueryHints(
             @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
     @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,a.fullName,count(l) ,false) " +
-            "from Poem p join p.author a left join p.likes l where p.name like CONCAT('%',:name ,'%')" +
+            "from Poem p join p.author a left join p.likes l where p.name like CONCAT('%',:name,'%')" +
             "group by p.id,a.fullName ")
     Page<PoemsDto> findAllPoemsByName(Pageable pageable, @Param("name") String name);
 
