@@ -7,12 +7,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.poems_club.dto.poem.PoemDto;
 import ua.poems_club.dto.poem.PoemsDto;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
+import ua.poems_club.security.model.JwtTokenProvider;
 import ua.poems_club.service.PoemService;
 
 import java.util.List;
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ua.poems_club.generator.AuthorGenerator.*;
 import static ua.poems_club.generator.PoemGenerator.*;
 
+@WithMockUser
 @WebMvcTest(PoemController.class)
 public class PoemControllerTest {
     @Autowired
@@ -35,6 +38,9 @@ public class PoemControllerTest {
 
     @MockBean
     private PoemService service;
+
+    @MockBean
+    private JwtTokenProvider tokenProvider;
 
     private List<Author> authors;
     private List<Poem> poems;

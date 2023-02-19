@@ -1,6 +1,7 @@
 package ua.poems_club.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.web.servlet.MockMvc;
 
 import ua.poems_club.dto.author.*;
@@ -21,6 +23,7 @@ import ua.poems_club.exception.NotFoundException;
 
 import ua.poems_club.generator.AuthorGenerator;
 import ua.poems_club.model.Author;
+import ua.poems_club.security.model.JwtTokenProvider;
 import ua.poems_club.service.AuthorService;
 
 import java.util.List;
@@ -36,8 +39,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WithMockUser
 @WebMvcTest(AuthorController.class)
-@ActiveProfiles("test")
 public class AuthorControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +48,11 @@ public class AuthorControllerTest {
     @MockBean
     private AuthorService service;
 
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
     private List<Author> authors;
+
     @BeforeEach
     void setUp() {
         authors = AuthorGenerator.generateAuthorsWithId(5);
@@ -125,7 +132,8 @@ public class AuthorControllerTest {
         var authorDto = new CreateAuthorDto(author.getFullName(), author.getEmail(), author.getPassword());
         mockMvc.perform(post("/api/authors")
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(authorDto)))
+                        .content(mapObjectToString(authorDto))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(result -> assertThat(Objects.requireNonNull(result.getResponse().getRedirectedUrl())
@@ -144,7 +152,8 @@ public class AuthorControllerTest {
 
         mockMvc.perform(post("/api/authors")
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(authorDto)))
+                        .content(mapObjectToString(authorDto))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
@@ -159,7 +168,8 @@ public class AuthorControllerTest {
 
         mockMvc.perform(put("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(author)))
+                        .content(mapObjectToString(author))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertThat(Objects.requireNonNull(result.getResponse().getRedirectedUrl())
@@ -178,7 +188,8 @@ public class AuthorControllerTest {
 
         mockMvc.perform(put("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(authorDto)))
+                        .content(mapObjectToString(authorDto))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
@@ -196,7 +207,8 @@ public class AuthorControllerTest {
 
         mockMvc.perform(patch("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(password)))
+                        .content(mapObjectToString(password))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
@@ -216,7 +228,8 @@ public class AuthorControllerTest {
 
         mockMvc.perform(patch("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(password)))
+                        .content(mapObjectToString(password))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
@@ -235,7 +248,7 @@ public class AuthorControllerTest {
         when(service.deleteAuthor(1L)).thenReturn(author);
 
         mockMvc.perform(delete("/api/authors/1")
-                        .contentType(APPLICATION_JSON))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fullName",is(author.getFullName())))
@@ -244,10 +257,10 @@ public class AuthorControllerTest {
 
 
 
-
     @SneakyThrows
     private<T> String mapObjectToString(T author){
-        ObjectMapper objectMapper = new ObjectMapper();
+        var objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
         return objectMapper.writeValueAsString(author);
     }
 }
