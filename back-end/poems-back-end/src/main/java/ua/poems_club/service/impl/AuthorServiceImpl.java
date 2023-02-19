@@ -144,6 +144,16 @@ public class AuthorServiceImpl implements AuthorService {
     private void removeAuthor(Long id) {
         authorRepository.deleteById(id);
     }
+
+    @Override
+    public Author getAuthorByEmail(String email) {
+        return getByEmail(email);
+    }
+
+    private Author getByEmail(String email){
+        return authorRepository.findByEmail(email)
+                .orElseThrow(()-> new NotFoundException("Cannot find author by email: "+email));
+    }
 }
 
 

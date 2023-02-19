@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 import static java.time.LocalDateTime.*;
-import static ua.poems_club.model.Author.Role.USER;
 import static ua.poems_club.model.Author.Status.*;
+import static ua.poems_club.model.Role.USER;
 
 @Setter
 @Getter
@@ -48,10 +48,6 @@ public class Author {
 
     @Enumerated(EnumType.STRING)
     private Role role = USER;
-
-    public enum Role{
-        USER
-    }
 
     @Enumerated(EnumType.STRING)
     private Status status = ACTIVE;

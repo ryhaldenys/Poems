@@ -2,6 +2,7 @@ package ua.poems_club.builder;
 
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
+import ua.poems_club.model.Role;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,8 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static ua.poems_club.model.Author.Role.USER;
 import static ua.poems_club.model.Author.Status.ACTIVE;
+import static ua.poems_club.model.Role.USER;
 
 public class AuthorBuilder {
     private Long id;
@@ -19,7 +20,7 @@ public class AuthorBuilder {
     private String imageUrl;
     private String email;
     private String password;
-    private Author.Role role = USER;
+    private Role role = USER;
     private Author.Status status = ACTIVE;
     private final List<Poem> poems = new ArrayList<>();
     private final Set<Author> subscribers = new HashSet<>();
@@ -67,7 +68,7 @@ public class AuthorBuilder {
         return this;
     }
 
-    public AuthorBuilder role(Author.Role role){
+    public AuthorBuilder role(Role role){
         this.role =role;
         return this;
     }

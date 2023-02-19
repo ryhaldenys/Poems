@@ -12,4 +12,5 @@ public interface AuthorService {
     void updateAuthor(Long id, UpdateAuthorDto author);
     void updateAuthorPassword(Long id, PasswordDto password);
     Author deleteAuthor(Long id);
+    Author getAuthorByEmail(String email);
 }
