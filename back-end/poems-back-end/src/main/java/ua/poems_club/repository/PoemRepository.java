@@ -28,6 +28,6 @@ public interface PoemRepository extends JpaRepository<Poem,Long> {
     Page<PoemsDto> findAllPoemsByName(Pageable pageable, @Param("name") String name);
 
     @Query("select new ua.poems_club.dto.poem.PoemDto(p.id,p.name,p.text,a.id,a.fullName)" +
-            " from Poem p join p.author a where a.id =?1")
-    Optional<PoemDto> findPoemById(Long author);
+            " from Poem p join p.author a where p.id =?1")
+    Optional<PoemDto> findPoemById(Long authorId);
 }

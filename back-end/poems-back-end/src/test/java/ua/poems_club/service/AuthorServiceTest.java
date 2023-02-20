@@ -8,7 +8,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import ua.poems_club.dto.author.AuthorImageUrlDto;
 import ua.poems_club.dto.author.CreateAuthorDto;
 import ua.poems_club.dto.author.PasswordDto;
 import ua.poems_club.dto.author.UpdateAuthorDto;
@@ -25,9 +28,12 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 @RequiredArgsConstructor
 @ActiveProfiles(profiles = "test")
+@Transactional
 public class AuthorServiceTest {
     @Autowired
     private AuthorService authorService;
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     @Autowired
     private AuthorRepository authorRepository;
@@ -76,11 +82,11 @@ public class AuthorServiceTest {
     @Test
     void createAccountTest(){
         var newAuthor = new CreateAuthorDto("fullName","email","new");
-
         var authorId = authorService.createAuthor(newAuthor);
+        var author = authorRepository.findById(authorId).orElseThrow();
 
-        System.out.println(authorId);
         assertThat(authorId).isNotNull();
+        assertThat(encoder.matches("new",author.getPassword())).isTrue();
     }
 
     @Test
@@ -109,6 +115,7 @@ public class AuthorServiceTest {
         var id = authors.get(0).getId();
         var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello");
         authorService.updateAuthor(id,updateAuthorDto);
+        authorRepository.flush();
 
         var author = authorRepository.findById(id)
                 .orElseThrow();
@@ -151,14 +158,18 @@ public class AuthorServiceTest {
     @Test
     void updatePasswordTest(){
         var author = authors.get(1);
-        var password = new PasswordDto(author.getPassword(),"newpassword");
+        var authorPassword = author.getPassword();
+
+        author.setPassword(encoder.encode(author.getPassword()));
+        authorRepository.flush();
+        var password = new PasswordDto(authorPassword,"newpassword");
+
         authorService.updateAuthorPassword(author.getId(),password);
+        authorRepository.flush();
+        var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
-        var foundAuthor = authorRepository.findById(author.getId())
-                        .orElseThrow();
-
-        assertThat(foundAuthor.getPassword())
-                .isEqualTo(password.newPassword());
+        assertThat(encoder.matches(password.newPassword(), foundAuthor.getPassword()))
+                .isTrue();
     }
 
     @Test
@@ -172,6 +183,42 @@ public class AuthorServiceTest {
         assertThat(isAuthor).isFalse();
     }
 
+
+    @Test
+    void updateAuthorImageUrlTest(){
+        var author = authors.get(2);
+
+        authorService.updateAuthorImageUrl(author.getId(),new AuthorImageUrlDto("new/url"));
+        var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
+
+        assertThat(foundAuthor.getImageUrl()).isEqualTo("new/url");
+    }
+
+    @Test
+    void addSubscriptionTest(){
+        var author = authors.get(0);
+        var subscription = authors.get(1);
+        authorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
+        authorRepository.flush();
+
+        var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
+
+        assertThat(foundAuthor.getSubscriptions().contains(subscription)).isTrue();
+    }
+
+    @Test
+    void removeSubscriptionTest(){
+        var author = authors.get(0);
+        var subscription = authors.get(1);
+        author.addSubscription(subscription);
+
+        authorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
+        authorRepository.flush();
+
+        var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
+
+        assertThat(foundAuthor.getSubscriptions().contains(subscription)).isFalse();
+    }
 
     @AfterEach
     void tearDown() {

@@ -21,7 +21,6 @@ import static ua.poems_club.model.Role.USER;
 @Entity
 @EqualsAndHashCode(of = "email")
 @Table(name = "author")
-@ToString(of = "fullName")
 public class Author {
 
     @Id
@@ -97,7 +96,7 @@ public class Author {
     }
 
     public void addSubscription(Author author){
-        subscriptions.add(author);
+        this.subscriptions.add(author);
         author.getSubscribers().add(this);
     }
 
@@ -117,4 +116,19 @@ public class Author {
         like.getLikes().add(this);
     }
 
+    public void removeSubscription(Author author){
+        this.subscriptions.remove(author);
+        author.getSubscribers().remove(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", fullName='" + fullName + '\'' +
+                ", description='" + description + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

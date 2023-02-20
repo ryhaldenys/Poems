@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
@@ -59,7 +60,7 @@ public class AuthorController {
     }
 
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/password")
     @PreAuthorize("hasAuthority('simple')")
     public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody PasswordDto password){
         authorService.updateAuthorPassword(id,password);
@@ -69,6 +70,19 @@ public class AuthorController {
         return ResponseEntity.status(NO_CONTENT)
                 .location(uri)
                 .build();
+    }
+
+
+    @PatchMapping("/{id}/image")
+    @ResponseStatus(NO_CONTENT)
+    public void updateImageUrl(@PathVariable Long id,@RequestBody AuthorImageUrlDto imageUrl){
+        authorService.updateAuthorImageUrl(id,imageUrl);
+    }
+
+
+    @PatchMapping("{id}/subscriptions/{subscription_id}")
+    public void updateAuthorSubscriptions(@PathVariable Long id, @PathVariable("subscription_id") Long subscriptionId){
+        authorService.updateAuthorSubscriptions(id,subscriptionId);
     }
 
     @DeleteMapping("/{id}")

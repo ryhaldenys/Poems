@@ -33,4 +33,14 @@ public interface AuthorRepository extends JpaRepository<Author,Long> {
     Optional<Author> findByEmail(String email);
     Optional<Author> findByFullName(String fullName);
 
+
+    @QueryHints(
+            @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
+    @Query("select distinct a from Author a left join fetch a.subscriptions where a.id =?1")
+    Optional<Author> findAuthorFetchSubscriptions(Long id);
+
+    @QueryHints(
+            @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
+    @Query("select distinct a from Author a left join fetch a.subscribers where a.id =?1")
+    Optional<Author> findAuthorFetchSubscribers(Long id);
 }

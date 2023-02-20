@@ -3,6 +3,7 @@ package ua.poems_club.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.builder.AuthorBuilder;
@@ -19,6 +20,7 @@ import ua.poems_club.service.AuthorService;
 @Transactional(readOnly = true)
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public Page<AuthorsDto> getAllAuthors(Pageable pageable) {
@@ -52,6 +54,7 @@ public class AuthorServiceImpl implements AuthorService {
     private Long create(CreateAuthorDto authorDto){
         var author = buildAuthor(authorDto);
         checkAuthorIsExist(author);
+        encodePassword(author);
         authorRepository.save(author);
         return author.getId();
     }
@@ -74,6 +77,11 @@ public class AuthorServiceImpl implements AuthorService {
         if (authorRepository.findByEmail(email).isPresent()){
             throw new AuthorAlreadyExist("Author with email: "+email+", already exist");
         }
+    }
+
+    private void encodePassword(Author author){
+        var password = author.getPassword();
+        author.setPassword(passwordEncoder.encode(password));
     }
 
     private void checkIsAuthorByFullName(String fullName){
@@ -118,12 +126,12 @@ public class AuthorServiceImpl implements AuthorService {
 
     private void updateAuthorPassword(Author author, PasswordDto password) {
         checkIfOldPasswordIsCorrect(author.getPassword(), password.oldPassword());
-        author.setPassword(password.newPassword());
+        var encodedNewPassword = passwordEncoder.encode(password.newPassword());
+        author.setPassword(encodedNewPassword);
     }
 
     private void checkIfOldPasswordIsCorrect(String authorPassword,String oldPassword){
-        //todo:encodepassword;
-        if (!authorPassword.equals(oldPassword)){
+        if (!passwordEncoder.matches(oldPassword,authorPassword)){
             throw new IncorrectAuthorDetailsException("Entered old password does not equal user password");
         }
     }
@@ -153,6 +161,56 @@ public class AuthorServiceImpl implements AuthorService {
     private Author getByEmail(String email){
         return authorRepository.findByEmail(email)
                 .orElseThrow(()-> new NotFoundException("Cannot find author by email: "+email));
+    }
+
+    @Override
+    @Transactional
+    public void updateAuthorImageUrl(Long id,AuthorImageUrlDto imageUrl) {
+        var author = getAuthor(id);
+        updateImage(author,imageUrl);
+    }
+
+    private void updateImage(Author author,AuthorImageUrlDto imageUrl) {
+        author.setImageUrl(imageUrl.imageUrl());
+    }
+
+    @Override
+    @Transactional
+    public void updateAuthorSubscriptions(Long authorId, Long subscriptionId) {
+        var author = getAuthorFetchSubscriptions(authorId);
+        var subscription = getAuthorFetchSubscribers(subscriptionId);
+
+        updateAuthorSubscriptions(author,subscription);
+    }
+
+    private void updateAuthorSubscriptions(Author author, Author subscription) {
+        if (checkIsSubscription(author, subscription))
+            removeSubscription(author, subscription);
+        else
+            addSubscription(author,subscription);
+    }
+
+
+    private boolean checkIsSubscription(Author author, Author subscription){
+        return author.getSubscriptions().contains(subscription);
+    }
+
+    private void removeSubscription(Author author, Author subscription) {
+        author.removeSubscription(subscription);
+    }
+
+    private void addSubscription(Author author, Author subscription) {
+        author.addSubscription(subscription);
+    }
+
+    private Author getAuthorFetchSubscriptions(Long authorId) {
+        return authorRepository.findAuthorFetchSubscriptions(authorId)
+                .orElseThrow(()-> throwNotFoundAuthorById(authorId));
+    }
+
+    private Author getAuthorFetchSubscribers(Long subscriptionId) {
+        return authorRepository.findAuthorFetchSubscribers(subscriptionId)
+                .orElseThrow(()->throwNotFoundAuthorById(subscriptionId));
     }
 }
 

@@ -1,7 +1,7 @@
 package ua.poems_club.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import lombok.SneakyThrows;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -239,6 +239,20 @@ public class AuthorControllerTest {
 
     @Test
     @SneakyThrows
+    void updateAuthorImageUrlTest(){
+
+        var imageUrl = new AuthorImageUrlDto("new");
+        mockMvc.perform(patch("/api/authors/1/password")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapObjectToString(imageUrl))
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+
+    @Test
+    @SneakyThrows
     void deleteAuthorTest(){
         var author = authors.get(0);
 
@@ -254,7 +268,6 @@ public class AuthorControllerTest {
                 .andExpect(jsonPath("$.fullName",is(author.getFullName())))
                 .andExpect(jsonPath("$.email",is(author.getEmail())));
     }
-
 
 
     @SneakyThrows

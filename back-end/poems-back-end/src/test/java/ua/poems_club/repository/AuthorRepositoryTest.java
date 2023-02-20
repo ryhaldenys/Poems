@@ -27,6 +27,9 @@ public class AuthorRepositoryTest {
     void setUp() {
         authors = generateAuthorsWithoutId(5);
         authorRepository.saveAll(authors);
+        var author = authors.get(0);
+        author.addSubscription(authors.get(1));
+        author.addSubscription(authors.get(2));
     }
 
     @Test
@@ -52,5 +55,17 @@ public class AuthorRepositoryTest {
 
         assertThat(foundAuthor.id()).isEqualTo(author.getId());
         assertThat(foundAuthor.fullName()).isEqualTo(author.getFullName());
+    }
+
+    @Test
+    void findAuthorFetchSubscriptionsById(){
+        author = authors.get(0);
+
+        var foundAuthor = authorRepository.findAuthorFetchSubscriptions(author.getId())
+                .orElseThrow();
+
+        assertThat(foundAuthor.getId()).isEqualTo(author.getId());
+        assertThat(foundAuthor.getSubscriptions().contains(authors.get(1))).isTrue();
+        assertThat(foundAuthor.getSubscriptions().contains(authors.get(2))).isTrue();
     }
 }
