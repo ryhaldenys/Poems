@@ -50,17 +50,18 @@ public class AuthorServiceTest {
         authorRepository.deleteAll();
         var pageable = Mockito.any(Pageable.class);
         assertThatException()
-                .isThrownBy(()-> authorService.getAllAuthors(pageable));
+                .isThrownBy(()-> authorService.getAllAuthors(1L,pageable));
 
     }
 
     @Test
     void getAllAuthorsTest(){
         var author = authors.get(0);
+        var currentUser = authors.get(1).getId();
         var pageable = Mockito.any(Pageable.class);
-        var authors = authorService.getAllAuthors(pageable).getContent();
+        var authors = authorService.getAllAuthors(currentUser,pageable).getContent();
 
-        assertThat(authors.get(0).id()).isEqualTo(author.getId());
+        assertThat(authors.get(0).getId()).isEqualTo(author.getId());
 
     }
 
@@ -170,6 +171,18 @@ public class AuthorServiceTest {
 
         assertThat(encoder.matches(password.newPassword(), foundAuthor.getPassword()))
                 .isTrue();
+    }
+
+    @Test
+    void getAuthorByEmailTest(){
+        var author = authors.get(0);
+        var foundAuthor = authorService.getAuthorByEmail(author.getEmail());
+        assertThat(foundAuthor).isEqualTo(author);
+    }
+    @Test
+    void getAuthorByWrongEmailTest(){
+        assertThatThrownBy(()->authorService.getAuthorByEmail("wrongemail@gmail.com"))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

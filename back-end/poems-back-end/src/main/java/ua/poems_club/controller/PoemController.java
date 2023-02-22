@@ -8,7 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua.poems_club.dto.poem.PoemDto;
 import ua.poems_club.dto.poem.PoemsDto;
-import ua.poems_club.model.Author;
+import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.PoemService;
 
 @RestController
@@ -19,9 +19,8 @@ public class PoemController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('simple')")
-    public Page<PoemsDto> getAll(@AuthenticationPrincipal Author author, Pageable pageable, @RequestParam(defaultValue = "")String name){
-        System.out.println(author);
-        return poemService.getAllPoems(pageable,name);
+    public Page<PoemsDto> getAll(@AuthenticationPrincipal SecurityUser author, Pageable pageable, @RequestParam(defaultValue = "")String name){
+        return poemService.getAllPoems(author.getId(),pageable,name);
     }
 
     @GetMapping("/{id}")

@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.web.servlet.MockMvc;
 
 import ua.poems_club.dto.author.*;
@@ -24,6 +24,7 @@ import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.generator.AuthorGenerator;
 import ua.poems_club.model.Author;
 import ua.poems_club.security.model.JwtTokenProvider;
+import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.AuthorService;
 
 import java.util.List;
@@ -35,6 +36,7 @@ import static org.hamcrest.core.Is.*;
 import static org.mockito.Mockito.*;
 
 import static org.springframework.http.MediaType.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,9 +54,11 @@ public class AuthorControllerTest {
     private JwtTokenProvider jwtTokenProvider;
 
     private List<Author> authors;
+    private UserDetails currentUser;
 
     @BeforeEach
     void setUp() {
+        currentUser = SecurityUser.fromUser(AuthorGenerator.generateAuthorWithId());
         authors = AuthorGenerator.generateAuthorsWithId(5);
     }
 
@@ -64,36 +68,36 @@ public class AuthorControllerTest {
         var authorsDtos = authors.stream().map(a -> new AuthorsDto(a.getId(),a.getFullName(),a.getDescription()
                 ,a.getImageUrl(), (long) a.getSubscribers().size(), (long) a.getPoems().size(),false))
                 .toList();
-
         Page<AuthorsDto> page = new PageImpl<>(authorsDtos);
 
-        when(service.getAllAuthors(any(Pageable.class)))
+        when(service.getAllAuthors(anyLong(),any(Pageable.class)))
                 .thenReturn(page);
 
         mockMvc.perform(get("/api/authors")
-                        .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON)
+                        .with(user(currentUser)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].fullName", is(authorsDtos.get(0).fullName())))
-                .andExpect(jsonPath("$.content[1].fullName", is(authorsDtos.get(1).fullName())));
+                .andExpect(jsonPath("$.content[0].fullName", is(authorsDtos.get(0).getFullName())))
+                .andExpect(jsonPath("$.content[1].fullName", is(authorsDtos.get(1).getFullName())));
 
     }
 
     @SneakyThrows
     @Test
     void getEmptyPageOfAuthorsTest(){
-        when(service.getAllAuthors(any(Pageable.class)))
+        when(service.getAllAuthors(anyLong(),any(Pageable.class)))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/authors")
-                        .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON)
+                        .with(user(currentUser)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(NotFoundException.class));
 
     }
-
 
     @Test
     @SneakyThrows
@@ -205,14 +209,14 @@ public class AuthorControllerTest {
 
         var password = new PasswordDto("old","new");
 
-        mockMvc.perform(patch("/api/authors/"+author.getId())
+        mockMvc.perform(patch("/api/authors/"+author.getId()+"/password")
                         .contentType(APPLICATION_JSON)
                         .content(mapObjectToString(password))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertThat(result.getResponse().getRedirectedUrl())
-                        .isEqualTo("http://localhost/api/authors/"+author.getId())
+                        .isEqualTo("http://localhost/api/authors/"+author.getId()+"/password")
                 );
     }
 
@@ -226,7 +230,7 @@ public class AuthorControllerTest {
         BDDMockito.willThrow(IncorrectAuthorDetailsException.class)
                 .given(service).updateAuthorPassword(author.getId(),password);
 
-        mockMvc.perform(patch("/api/authors/"+author.getId())
+        mockMvc.perform(patch("/api/authors/"+author.getId()+"/password")
                         .contentType(APPLICATION_JSON)
                         .content(mapObjectToString(password))
                         .with(csrf()))
@@ -242,9 +246,20 @@ public class AuthorControllerTest {
     void updateAuthorImageUrlTest(){
 
         var imageUrl = new AuthorImageUrlDto("new");
-        mockMvc.perform(patch("/api/authors/1/password")
+        mockMvc.perform(patch("/api/authors/1/image")
                         .contentType(APPLICATION_JSON)
                         .content(mapObjectToString(imageUrl))
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateAmountOfAuthorSubscriptionsTest(){
+
+        mockMvc.perform(patch("/api/authors/1/subscriptions/2")
+                        .contentType(APPLICATION_JSON)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent());

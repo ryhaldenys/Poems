@@ -37,9 +37,8 @@ public class PoemRepositoryTest {
     @Test
     void findAllPoemsTest(){
         var poemsDtos = mapToPoemsDto();
-        var foundPoems = poemRepository.findAllPoems(any(Pageable.class));
-
-        foundPoems.forEach(p-> System.out.println(p.amountLikes()));
+        var currentUser = authors.get(1);
+        var foundPoems = poemRepository.findAllPoems(currentUser.getId(),any(Pageable.class));
 
         assertThat(foundPoems.getContent()).isEqualTo(poemsDtos);
     }
@@ -53,8 +52,9 @@ public class PoemRepositoryTest {
     @Test
     void findAllPoemsByNameTest(){
         var poemsDtos = mapToPoemsDto();
+        var currentUser = authors.get(1);
 
-        var foundPoems = poemRepository.findAllPoemsByName(any(Pageable.class),poemsDtos.get(0).name())
+        var foundPoems = poemRepository.findAllPoemsByName(currentUser.getId(),any(Pageable.class),poemsDtos.get(0).getName())
                 .getContent();
 
         assertThat(foundPoems.get(0)).isEqualTo(poemsDtos.get(0));
@@ -69,6 +69,18 @@ public class PoemRepositoryTest {
         assertThat(foundPoem.name()).isEqualTo(poem.getName());
     }
 
+    @Test
+    void findByAuthorId(){
+        var author = authors.get(0);
+        var currentAuthor = authors.get(1);
+        var foundPoems = poemRepository.findAllByAuthorId(author.getId(),currentAuthor.getId(),any(Pageable.class))
+                .getContent();
+
+        assertThat(foundPoems.get(0).getId()).isEqualTo(author.getPoems().get(0).getId());
+        assertThat(foundPoems.get(0).getName()).isEqualTo(author.getPoems().get(0).getName());
+        assertThat(foundPoems.get(0).isLike()).isTrue();
+    }
+
     private void addDataToDB(){
         authors = AuthorGenerator.generateAuthorsWithoutId(5);
         poems = PoemGenerator.generatePoemsWithoutId(5);
@@ -78,10 +90,10 @@ public class PoemRepositoryTest {
         }
         authorRepository.saveAll(authors);
 
-
+        authors.get(1).addLike(poems.get(0));
         authors.get(0).addAllLikes(new HashSet<>(poems));
         authors.get(0).addSubscriber(authors.get(1));
-        authors.get(0).addSubscriber(authors.get(2));
+        authors.get(1).addSubscriber(authors.get(0));
         authors.get(3).addSubscriber(authors.get(0));
     }
 }

@@ -5,11 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
+import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.AuthorService;
 
 import static org.springframework.http.HttpStatus.*;
@@ -22,8 +24,8 @@ public class AuthorController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('simple')")
-    public Page<AuthorsDto> getAll(Pageable pageable){
-        return authorService.getAllAuthors(pageable);
+    public Page<AuthorsDto> getAll(Pageable pageable, @AuthenticationPrincipal SecurityUser currentUser){
+        return authorService.getAllAuthors(currentUser.getId(),pageable);
     }
 
     @GetMapping("/{id}")
@@ -75,12 +77,14 @@ public class AuthorController {
 
     @PatchMapping("/{id}/image")
     @ResponseStatus(NO_CONTENT)
+    @PreAuthorize("hasAuthority('simple')")
     public void updateImageUrl(@PathVariable Long id,@RequestBody AuthorImageUrlDto imageUrl){
         authorService.updateAuthorImageUrl(id,imageUrl);
     }
 
-
     @PatchMapping("{id}/subscriptions/{subscription_id}")
+    @ResponseStatus(NO_CONTENT)
+    @PreAuthorize("hasAuthority('simple')")
     public void updateAuthorSubscriptions(@PathVariable Long id, @PathVariable("subscription_id") Long subscriptionId){
         authorService.updateAuthorSubscriptions(id,subscriptionId);
     }

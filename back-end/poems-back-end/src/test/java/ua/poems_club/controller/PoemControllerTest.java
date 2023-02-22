@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.poems_club.dto.poem.PoemDto;
@@ -15,6 +16,7 @@ import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 import ua.poems_club.security.model.JwtTokenProvider;
+import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.PoemService;
 
 import java.util.List;
@@ -27,8 +29,11 @@ import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+
 import static ua.poems_club.generator.AuthorGenerator.*;
 import static ua.poems_club.generator.PoemGenerator.*;
+
 
 @WithMockUser
 @WebMvcTest(PoemController.class)
@@ -44,25 +49,29 @@ public class PoemControllerTest {
 
     private List<Author> authors;
     private List<Poem> poems;
+    private Author author;
+    private UserDetails securityUser;
 
     @BeforeEach
     void setUp() {
+        securityUser = SecurityUser.fromUser(generateAuthorWithId());
         authors = generateAuthorsWithId(5);
         poems = generatePoemsWithId(5);
-
         for (int i = 0; i < authors.size(); i++) {
             authors.get(i).addPoem(poems.get(i));
         }
+        author = authors.get(0);
     }
 
     @Test
     @SneakyThrows
     void getAllTest(){
-        when(service.getAllPoems(any(Pageable.class),anyString()))
+        when(service.getAllPoems(anyLong(), any(Pageable.class),anyString()))
                 .thenReturn(new PageImpl<>(mapToPoemsDto(poems)));
 
         mockMvc.perform(get("/api/poems")
-                .contentType(APPLICATION_JSON))
+                .contentType(APPLICATION_JSON)
+                        .with(user(securityUser)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name", is(poems.get(0).getName())))
@@ -72,11 +81,12 @@ public class PoemControllerTest {
     @Test
     @SneakyThrows
     void getAllFromEmptyDBTest(){
-        when(service.getAllPoems(any(Pageable.class),anyString()))
+        when(service.getAllPoems(anyLong(), any(Pageable.class),anyString()))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/poems")
-                        .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON)
+                        .with(user(securityUser)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertThat(result.getResolvedException())

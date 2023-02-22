@@ -20,16 +20,16 @@ public class PoemServiceImpl implements PoemService {
     private final PoemRepository poemRepository;
 
     @Override
-    public Page<PoemsDto> getAllPoems(Pageable pageable,String name) {
-        return getPoems(pageable,name);
+    public Page<PoemsDto> getAllPoems(Long currentUserId, Pageable pageable, String name) {
+        return getPoems(currentUserId,pageable,name);
     }
 
-    private Page<PoemsDto> getPoems(Pageable pageable,String name){
-        return name.isEmpty()? getAll(pageable) : getAllByName(pageable, name);
+    private Page<PoemsDto> getPoems(Long currentUserId, Pageable pageable, String name){
+        return name.isEmpty()? getAll(currentUserId,pageable) : getAllByName(currentUserId,pageable, name);
     }
 
-    private Page<PoemsDto> getAll(Pageable pageable){
-        var poems = poemRepository.findAllPoems(pageable);
+    private Page<PoemsDto> getAll(Long currentUserId, Pageable pageable){
+        var poems = poemRepository.findAllPoems(currentUserId,pageable);
         checkIsPoems(poems.getContent());
         return poems;
     }
@@ -40,8 +40,8 @@ public class PoemServiceImpl implements PoemService {
         }
     }
 
-    private Page<PoemsDto> getAllByName(Pageable pageable, String name) {
-        var poems = poemRepository.findAllPoemsByName(pageable, name);
+    private Page<PoemsDto> getAllByName(Long currentUserId, Pageable pageable, String name) {
+        var poems = poemRepository.findAllPoemsByName(currentUserId,pageable, name);
         checkIsPoems(poems.getContent());
         return poems;
     }

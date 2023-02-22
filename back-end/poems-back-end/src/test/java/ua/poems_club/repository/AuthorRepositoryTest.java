@@ -30,14 +30,15 @@ public class AuthorRepositoryTest {
         var author = authors.get(0);
         author.addSubscription(authors.get(1));
         author.addSubscription(authors.get(2));
+
     }
 
     @Test
     void findAllAuthors(){
         author = authors.get(0);
-
+        var currentUser = authors.get(1);
         var pageable = Mockito.any(Pageable.class);
-        var authorsPage = authorRepository.findAllAuthors(pageable);
+        var authorsPage = authorRepository.findAllAuthors(currentUser.getId(),pageable);
         var authors = authorsPage.getContent();
         AuthorsDto authorsDto = new AuthorsDto(author.getId(),author.getFullName(),author.getDescription(), author.getImageUrl(),
                 (long)author.getSubscribers().size(), (long)author.getPoems().size(),false);
@@ -68,4 +69,18 @@ public class AuthorRepositoryTest {
         assertThat(foundAuthor.getSubscriptions().contains(authors.get(1))).isTrue();
         assertThat(foundAuthor.getSubscriptions().contains(authors.get(2))).isTrue();
     }
+
+    @Test
+    void findAuthorFetchSubscribersById(){
+        author = authors.get(1);
+
+        var foundAuthor = authorRepository.findAuthorFetchSubscribers(author.getId())
+                .orElseThrow();
+
+        assertThat(foundAuthor.getId()).isEqualTo(author.getId());
+        assertThat(foundAuthor.getSubscribers().contains(authors.get(0))).isTrue();
+    }
+
+
 }
+

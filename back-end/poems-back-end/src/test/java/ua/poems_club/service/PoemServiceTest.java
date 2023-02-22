@@ -40,36 +40,38 @@ public class PoemServiceTest {
     private List<Author> authors;
     private List<Poem> poems;
     private List<PoemsDto> poemsDtos;
+    private Author currentUser;
 
 
     @BeforeEach
     void setUp() {
         addDataToDB();
-        poemsDtos = mapToPoemsDto(poems);
+        poemsDtos = mapToPoemsDto(currentUser,poems);
+        currentUser = authors.get(0);
     }
 
     @Test
     void getAllPoems(){
-        var foundPoems = poemService.getAllPoems(any(Pageable.class),"").getContent();
+        var foundPoems = poemService.getAllPoems(currentUser.getId(), any(Pageable.class),"").getContent();
         assertThat(foundPoems).isEqualTo(poemsDtos);
     }
 
-    private List<PoemsDto> mapToPoemsDto(List<Poem>poems) {
+    private List<PoemsDto> mapToPoemsDto(Author currentUser,List<Poem>poems) {
         return poems.stream().map((p)-> new PoemsDto(p.getId(),p.getName(),p.getText(),p.getAuthor().getId(),
-                        p.getAuthor().getFullName(),(long) p.getLikes().size(),false))
+                        p.getAuthor().getFullName(),(long) p.getLikes().size(),p.getLikes().contains(currentUser)))
                 .collect(Collectors.toList());
     }
 
     @Test
     void getAllPoemsByAuthorName(){
-        var foundPoems = poemService.getAllPoems(PageRequest.of(0,poems.size()), poems.get(0).getName()).getContent();
-        assertThat(foundPoems.get(0)).isEqualTo(mapToPoemsDto(poems).get(0));
+        var foundPoems = poemService.getAllPoems(currentUser.getId(), PageRequest.of(0,poems.size()), poems.get(0).getName()).getContent();
+        assertThat(foundPoems.get(0)).isEqualTo(mapToPoemsDto(currentUser,poems).get(0));
     }
 
     @Test
     void getAllPoemsFromEmptyDb(){
         authorRepository.deleteAll();
-        assertThatThrownBy(()->poemService.getAllPoems(any(Pageable.class),""))
+        assertThatThrownBy(()->poemService.getAllPoems(currentUser.getId(), any(Pageable.class),""))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -95,8 +97,5 @@ public class PoemServiceTest {
         authors.get(0).addSubscriber(authors.get(2));
         authors.get(3).addSubscriber(authors.get(0));
     }
-    @AfterEach
-    void tearDown() {
-        //poemRepository.deleteAll();
-    }
+
 }

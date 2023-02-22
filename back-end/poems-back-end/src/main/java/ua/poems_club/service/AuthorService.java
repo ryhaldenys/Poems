@@ -6,7 +6,7 @@ import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
 
 public interface AuthorService {
-    Page<AuthorsDto> getAllAuthors(Pageable pageable);
+    Page<AuthorsDto> getAllAuthors(Long id,Pageable pageable);
     AuthorDto getAuthorById(Long id);
     Long createAuthor(CreateAuthorDto author);
     void updateAuthor(Long id, UpdateAuthorDto author);

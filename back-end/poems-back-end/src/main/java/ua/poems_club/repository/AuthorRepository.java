@@ -15,10 +15,11 @@ import java.util.Optional;
 public interface AuthorRepository extends JpaRepository<Author,Long> {
     @QueryHints(
             @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
-    @Query("select distinct new ua.poems_club.dto.author.AuthorsDto(a.id,a.fullName,a.description,a.imageUrl, count(s),count(p),false)" +
+    @Query("select distinct new ua.poems_club.dto.author.AuthorsDto(a.id,a.fullName,a.description,a.imageUrl, count(s),count(p)," +
+            "sum(case when s.id =?1 then 1 else 0 end)" +
+            ") " +
             " from Author a left join a.subscribers s left join a.poems p group by a")
-    Page<AuthorsDto> findAllAuthors(Pageable pageable);
-    //todo: fix bag
+    Page<AuthorsDto> findAllAuthors(Long id,Pageable pageable);
 
 
     @QueryHints(

@@ -23,12 +23,12 @@ public class AuthorServiceImpl implements AuthorService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public Page<AuthorsDto> getAllAuthors(Pageable pageable) {
-        return getAll(pageable);
+    public Page<AuthorsDto> getAllAuthors(Long currentAuthorId,Pageable pageable) {
+        return getAll(currentAuthorId,pageable);
     }
 
-    private Page<AuthorsDto> getAll(Pageable pageable){
-        var authors = authorRepository.findAllAuthors(pageable);
+    private Page<AuthorsDto> getAll(Long currentAuthorId, Pageable pageable){
+        var authors = authorRepository.findAllAuthors(currentAuthorId,pageable);
         if(authors.getContent().isEmpty()){
             throw new NotFoundException("Cannot find any authors");
         }

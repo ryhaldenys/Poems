@@ -6,6 +6,6 @@ import ua.poems_club.dto.poem.PoemDto;
 import ua.poems_club.dto.poem.PoemsDto;
 
 public interface PoemService {
-    Page<PoemsDto> getAllPoems(Pageable pageable,String name);
+    Page<PoemsDto> getAllPoems(Long currentUserId, Pageable pageable, String name);
     PoemDto getPoemById(Long id);
 }
