@@ -52,6 +52,16 @@ public class Poem {
         author.getPoems().add(this);
     }
 
+    public void addLike(Author author){
+        this.likes.add(author);
+        author.getMyLikes().add(this);
+    }
+
+    public void removeLike(Author author){
+        this.likes.remove(author);
+        author.getMyLikes().remove(this);
+    }
+
     public void addAllLikes(Set<Author> likes){
         this.likes = likes;
         likes.forEach(l->l.getMyLikes().add(this));

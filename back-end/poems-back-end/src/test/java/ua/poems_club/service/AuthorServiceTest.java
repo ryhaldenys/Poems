@@ -1,18 +1,20 @@
 package ua.poems_club.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import ua.poems_club.dto.author.AuthorImageUrlDto;
-import ua.poems_club.dto.author.CreateAuthorDto;
+import org.springframework.util.FileSystemUtils;
 import ua.poems_club.dto.author.PasswordDto;
 import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
@@ -21,9 +23,11 @@ import ua.poems_club.generator.AuthorGenerator;
 import ua.poems_club.model.Author;
 import ua.poems_club.repository.AuthorRepository;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @RequiredArgsConstructor
@@ -39,6 +43,12 @@ public class AuthorServiceTest {
     private AuthorRepository authorRepository;
     private List<Author> authors;
 
+    @Value("${upload.path}")
+    private String uploadPath;
+
+    @Value("${file.path}")
+    private String filePath;
+
     @BeforeEach
     void setUp() {
         authors = AuthorGenerator.generateAuthorsWithoutId(5);
@@ -48,7 +58,7 @@ public class AuthorServiceTest {
     @Test
     void getAllAuthorsFromEmptyTableTest(){
         authorRepository.deleteAll();
-        var pageable = Mockito.any(Pageable.class);
+        var pageable = Pageable.unpaged();
         assertThatException()
                 .isThrownBy(()-> authorService.getAllAuthors(1L,pageable));
 
@@ -58,7 +68,7 @@ public class AuthorServiceTest {
     void getAllAuthorsTest(){
         var author = authors.get(0);
         var currentUser = authors.get(1).getId();
-        var pageable = Mockito.any(Pageable.class);
+        var pageable = Pageable.unpaged();
         var authors = authorService.getAllAuthors(currentUser,pageable).getContent();
 
         assertThat(authors.get(0).getId()).isEqualTo(author.getId());
@@ -70,7 +80,7 @@ public class AuthorServiceTest {
         var author = authors.get(2);
         var foundAuthor = authorService.getAuthorById(author.getId());
 
-        assertThat(foundAuthor.id()).isEqualTo(author.getId());
+        assertThat(foundAuthor.getId()).isEqualTo(author.getId());
 
     }
 
@@ -79,37 +89,6 @@ public class AuthorServiceTest {
         assertThatThrownBy(()->authorService.getAuthorById(100042L))
                 .isInstanceOf(NotFoundException.class);
     }
-
-    @Test
-    void createAccountTest(){
-        var newAuthor = new CreateAuthorDto("fullName","email","new");
-        var authorId = authorService.createAuthor(newAuthor);
-        var author = authorRepository.findById(authorId).orElseThrow();
-
-        assertThat(authorId).isNotNull();
-        assertThat(encoder.matches("new",author.getPassword())).isTrue();
-    }
-
-    @Test
-    void createAccountWithEmailWhichAlreadyExistTest(){
-        var email = authors.get(0).getEmail();
-        var newAuthor = new CreateAuthorDto("fullName",email,"new");
-
-        assertThatThrownBy(()->authorService.createAuthor(newAuthor))
-                .isInstanceOf(AuthorAlreadyExist.class)
-                .hasMessage("Author with email: "+email+", already exist");
-    }
-
-    @Test
-    void createAccountWithFullNameWhichAlreadyExistTest(){
-        var fullName = authors.get(0).getFullName();
-        var newAuthor = new CreateAuthorDto(fullName,"new","new");
-
-        assertThatThrownBy(()->authorService.createAuthor(newAuthor))
-                .isInstanceOf(AuthorAlreadyExist.class)
-                .hasMessage("Author with full name: "+fullName+", already exist");
-    }
-
 
     @Test
     void updateAuthorTest(){
@@ -197,14 +176,21 @@ public class AuthorServiceTest {
     }
 
 
+    @SneakyThrows
     @Test
     void updateAuthorImageUrlTest(){
         var author = authors.get(2);
 
-        authorService.updateAuthorImageUrl(author.getId(),new AuthorImageUrlDto("new/url"));
+        MockMultipartFile multipartFile = new MockMultipartFile("file",
+                "hello.png", String.valueOf(MediaType.IMAGE_PNG),
+                "Hello, World!".getBytes()
+        );
+
+        authorService.addAuthorImage(author.getId(), multipartFile);
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
-        assertThat(foundAuthor.getImageUrl()).isEqualTo("new/url");
+        assertThat(foundAuthor.getImageName().contains("hello.png")).isTrue();
+        FileSystemUtils.deleteRecursively(Path.of(uploadPath + "/" + foundAuthor.getImageName()));
     }
 
     @Test

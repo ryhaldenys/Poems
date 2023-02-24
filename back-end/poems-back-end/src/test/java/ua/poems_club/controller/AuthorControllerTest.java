@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -66,7 +68,7 @@ public class AuthorControllerTest {
     @Test
     void getAllAuthorsTest(){
         var authorsDtos = authors.stream().map(a -> new AuthorsDto(a.getId(),a.getFullName(),a.getDescription()
-                ,a.getImageUrl(), (long) a.getSubscribers().size(), (long) a.getPoems().size(),false))
+                ,a.getImageName(), (long) a.getSubscribers().size(), (long) a.getPoems().size(),false))
                 .toList();
         Page<AuthorsDto> page = new PageImpl<>(authorsDtos);
 
@@ -111,8 +113,8 @@ public class AuthorControllerTest {
                 .contentType(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName",is(authorDto.fullName())))
-                .andExpect(jsonPath("$.email",is(authorDto.email())));
+                .andExpect(jsonPath("$.fullName",is(authorDto.getFullName())))
+                .andExpect(jsonPath("$.email",is(authorDto.getEmail())));
     }
 
     @Test
@@ -126,42 +128,6 @@ public class AuthorControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(NotFoundException.class)
-                );
-    }
-
-    @Test
-    @SneakyThrows
-    void saveAuthorTest(){
-        var author = authors.get(0);
-        var authorDto = new CreateAuthorDto(author.getFullName(), author.getEmail(), author.getPassword());
-        mockMvc.perform(post("/api/authors")
-                        .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(authorDto))
-                        .with(csrf()))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(result -> assertThat(Objects.requireNonNull(result.getResponse().getRedirectedUrl())
-                        .contains("http://localhost/api/authors/"))
-                        .isTrue()
-                );
-    }
-
-    @Test
-    @SneakyThrows
-    void saveAuthorWithEmailWhichAlreadyExist(){
-        var author = authors.get(2);
-        var authorDto = new CreateAuthorDto(author.getFullName(), author.getEmail(), author.getPassword());
-        when(service.createAuthor(authorDto))
-                .thenThrow(AuthorAlreadyExist.class);
-
-        mockMvc.perform(post("/api/authors")
-                        .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(authorDto))
-                        .with(csrf()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertThat(result.getResolvedException())
-                        .isInstanceOf(AuthorAlreadyExist.class)
                 );
     }
 
@@ -244,11 +210,12 @@ public class AuthorControllerTest {
     @Test
     @SneakyThrows
     void updateAuthorImageUrlTest(){
+        MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
+                "Hello, World!".getBytes()
+        );
 
-        var imageUrl = new AuthorImageUrlDto("new");
-        mockMvc.perform(patch("/api/authors/1/image")
-                        .contentType(APPLICATION_JSON)
-                        .content(mapObjectToString(imageUrl))
+        mockMvc.perform(multipart("/api/authors/1/image")
+                        .file(file)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent());

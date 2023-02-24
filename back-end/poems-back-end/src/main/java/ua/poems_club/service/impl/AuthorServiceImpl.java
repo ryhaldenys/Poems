@@ -1,19 +1,30 @@
 package ua.poems_club.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
 import ua.poems_club.builder.AuthorBuilder;
 import ua.poems_club.dto.author.*;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
+import ua.poems_club.exception.InvalidImagePathException;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.repository.AuthorRepository;
+import ua.poems_club.security.dto.RegistrationRequestDto;
 import ua.poems_club.service.AuthorService;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +33,21 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    @Value("${upload.path}")
+    private String uploadPath;
+
+    @Value("${file.path}")
+    private String imagePath;
+
+    @Value("${default.image}")
+    private String defaultImage;
+
+
     @Override
     public Page<AuthorsDto> getAllAuthors(Long currentAuthorId,Pageable pageable) {
-        return getAll(currentAuthorId,pageable);
+        var authors = getAll(currentAuthorId,pageable);
+        setImagePathForAll(authors);
+        return authors;
     }
 
     private Page<AuthorsDto> getAll(Long currentAuthorId, Pageable pageable){
@@ -35,9 +58,31 @@ public class AuthorServiceImpl implements AuthorService {
         return authors;
     }
 
+    private void setImagePathForAll(Page<AuthorsDto> authors) {
+        authors.forEach(this::setImagePath);
+    }
+
+    private void setImagePath(AuthorsDto author){
+        if (author.getImagePath() == null)
+            author.setImagePath(imagePath+uploadPath+"/"+defaultImage);
+        else
+            author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
+    }
+
+
+
     @Override
     public AuthorDto getAuthorById(Long id) {
-        return getById(id);
+        var author =  getById(id);
+        setImagePath(author);
+        return author;
+    }
+
+    private void setImagePath(AuthorDto author) {
+        if (author.getImagePath() == null)
+            author.setImagePath(imagePath+uploadPath+"/"+defaultImage);
+        else
+            author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
     }
 
     private AuthorDto getById(Long id){
@@ -47,11 +92,11 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    public Long createAuthor(CreateAuthorDto author) {
+    public Long createAuthor(RegistrationRequestDto author) {
         return create(author);
     }
 
-    private Long create(CreateAuthorDto authorDto){
+    private Long create(RegistrationRequestDto authorDto){
         var author = buildAuthor(authorDto);
         checkAuthorIsExist(author);
         encodePassword(author);
@@ -59,7 +104,7 @@ public class AuthorServiceImpl implements AuthorService {
         return author.getId();
     }
 
-    private Author buildAuthor(CreateAuthorDto authorDto){
+    private Author buildAuthor(RegistrationRequestDto authorDto){
         return AuthorBuilder.builder()
                 .fullName(authorDto.fullName())
                 .email(authorDto.email())
@@ -165,14 +210,59 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    public void updateAuthorImageUrl(Long id,AuthorImageUrlDto imageUrl) {
+    public void addAuthorImage(Long id, MultipartFile imageUrl) {
         var author = getAuthor(id);
-        updateImage(author,imageUrl);
+        addImage(author,imageUrl);
     }
 
-    private void updateImage(Author author,AuthorImageUrlDto imageUrl) {
-        author.setImageUrl(imageUrl.imageUrl());
+    private void addImage(Author author, MultipartFile multipartFile) {
+        try {
+            checkIsImagePathNotNull(multipartFile);
+            createDirectoryIfNotExist();
+            deleteOldImageIfItExist(author);
+
+            String fileName = generateUniqueFileName(multipartFile);
+
+            saveImage(multipartFile,fileName);
+            setNewImageToAuthor(author,fileName);
+
+        } catch (IOException e) {
+            throw new InvalidImagePathException("Invalid image path");
+        }
     }
+
+    private void deleteOldImageIfItExist(Author author) throws IOException {
+        var imageName = author.getImageName();
+        if (!Objects.isNull(imageName)){
+            FileSystemUtils.deleteRecursively(Path.of(uploadPath+"/"+imageName));
+        }
+    }
+
+    private void checkIsImagePathNotNull(MultipartFile multipartFile){
+        if(multipartFile == null)
+            throw new InvalidImagePathException("Gotten file is invalid");
+    }
+
+    private void createDirectoryIfNotExist(){
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()){
+            uploadDir.mkdir();
+        }
+    }
+
+    private String generateUniqueFileName(MultipartFile multipartFile){
+        String uuidFile = UUID.randomUUID().toString();
+        return uuidFile+"."+ multipartFile.getOriginalFilename();
+    }
+
+    private void saveImage(MultipartFile multipartFile, String fileName) throws IOException {
+        multipartFile.transferTo(new File(uploadPath +"/"+fileName));
+    }
+
+    private void setNewImageToAuthor(Author author,String fileName) {
+        author.setImageName(fileName);
+    }
+
 
     @Override
     @Transactional
@@ -182,6 +272,27 @@ public class AuthorServiceImpl implements AuthorService {
 
         updateAuthorSubscriptions(author,subscription);
     }
+
+    @Override
+    @Transactional
+    public void deleteImage(Long id) {
+        delete(id);
+    }
+
+    private void delete(Long id){
+        try {
+            var author = getAuthor(id);
+            deleteOldImageIfItExist(author);
+            setNullImageName(author);
+        } catch (IOException e) {
+            throw new InvalidImagePathException("Invalid image path");
+        }
+    }
+
+    private void setNullImageName(Author author){
+        author.setImageName(null);
+    }
+
 
     private void updateAuthorSubscriptions(Author author, Author subscription) {
         if (checkIsSubscription(author, subscription))

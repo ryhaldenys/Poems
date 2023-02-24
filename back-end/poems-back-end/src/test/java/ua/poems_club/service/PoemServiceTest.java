@@ -52,7 +52,7 @@ public class PoemServiceTest {
 
     @Test
     void getAllPoems(){
-        var foundPoems = poemService.getAllPoems(currentUser.getId(), any(Pageable.class),"").getContent();
+        var foundPoems = poemService.getAllPoems(currentUser.getId(), Pageable.unpaged(),"").getContent();
         assertThat(foundPoems).isEqualTo(poemsDtos);
     }
 
@@ -71,7 +71,7 @@ public class PoemServiceTest {
     @Test
     void getAllPoemsFromEmptyDb(){
         authorRepository.deleteAll();
-        assertThatThrownBy(()->poemService.getAllPoems(currentUser.getId(), any(Pageable.class),""))
+        assertThatThrownBy(()->poemService.getAllPoems(currentUser.getId(), Pageable.unpaged(),""))
                 .isInstanceOf(NotFoundException.class);
     }
 

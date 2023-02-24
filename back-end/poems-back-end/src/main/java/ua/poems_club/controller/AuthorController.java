@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
@@ -15,6 +16,7 @@ import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.AuthorService;
 
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.*;
 
 @RestController
 @RequestMapping("/api/authors")
@@ -34,19 +36,6 @@ public class AuthorController {
         return authorService.getAuthorById(id);
     }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('simple')")
-    public ResponseEntity<?> createAccount(@RequestBody CreateAuthorDto author){
-
-        var authorId = authorService.createAuthor(author);
-
-        var uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path("/{id}").buildAndExpand(authorId).toUri();
-
-        return ResponseEntity.status(CREATED)
-                .location(uri)
-                .build();
-    }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('simple')")
@@ -75,11 +64,18 @@ public class AuthorController {
     }
 
 
-    @PatchMapping("/{id}/image")
+    @PostMapping(value = "/{id}/image",produces = MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(NO_CONTENT)
     @PreAuthorize("hasAuthority('simple')")
-    public void updateImageUrl(@PathVariable Long id,@RequestBody AuthorImageUrlDto imageUrl){
-        authorService.updateAuthorImageUrl(id,imageUrl);
+    public void addImage(@PathVariable Long id,@RequestParam("file") MultipartFile multipartFile){
+        authorService.addAuthorImage(id,multipartFile);
+    }
+
+    @DeleteMapping(value = "/{id}/image")
+    @ResponseStatus(NO_CONTENT)
+    @PreAuthorize("hasAuthority('simple')")
+    public void deleteImage(@PathVariable Long id){
+        authorService.deleteImage(id);
     }
 
     @PatchMapping("{id}/subscriptions/{subscription_id}")

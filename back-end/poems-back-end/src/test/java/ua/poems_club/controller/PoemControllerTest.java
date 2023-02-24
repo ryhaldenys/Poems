@@ -112,7 +112,7 @@ public class PoemControllerTest {
     @Test
     @SneakyThrows
     void getPoemByIdFromEmptyDBTest(){
-        when(service.getPoemById(anyLong()))
+        when(service.getPoemById(1L))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/poems/1")

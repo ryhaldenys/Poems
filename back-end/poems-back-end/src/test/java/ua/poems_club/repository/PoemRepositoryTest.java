@@ -38,7 +38,7 @@ public class PoemRepositoryTest {
     void findAllPoemsTest(){
         var poemsDtos = mapToPoemsDto();
         var currentUser = authors.get(1);
-        var foundPoems = poemRepository.findAllPoems(currentUser.getId(),any(Pageable.class));
+        var foundPoems = poemRepository.findAllPoems(currentUser.getId(),Pageable.unpaged());
 
         assertThat(foundPoems.getContent()).isEqualTo(poemsDtos);
     }
@@ -54,7 +54,7 @@ public class PoemRepositoryTest {
         var poemsDtos = mapToPoemsDto();
         var currentUser = authors.get(1);
 
-        var foundPoems = poemRepository.findAllPoemsByName(currentUser.getId(),any(Pageable.class),poemsDtos.get(0).getName())
+        var foundPoems = poemRepository.findAllPoemsByName(currentUser.getId(),Pageable.unpaged(),poemsDtos.get(0).getName())
                 .getContent();
 
         assertThat(foundPoems.get(0)).isEqualTo(poemsDtos.get(0));
@@ -73,7 +73,7 @@ public class PoemRepositoryTest {
     void findByAuthorId(){
         var author = authors.get(0);
         var currentAuthor = authors.get(1);
-        var foundPoems = poemRepository.findAllByAuthorId(author.getId(),currentAuthor.getId(),any(Pageable.class))
+        var foundPoems = poemRepository.findAllByAuthorId(author.getId(),currentAuthor.getId(),Pageable.unpaged())
                 .getContent();
 
         assertThat(foundPoems.get(0).getId()).isEqualTo(author.getPoems().get(0).getId());

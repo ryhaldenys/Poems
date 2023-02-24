@@ -2,17 +2,20 @@ package ua.poems_club.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import ua.poems_club.dto.author.*;
 import ua.poems_club.model.Author;
+import ua.poems_club.security.dto.RegistrationRequestDto;
 
 public interface AuthorService {
     Page<AuthorsDto> getAllAuthors(Long id,Pageable pageable);
     AuthorDto getAuthorById(Long id);
-    Long createAuthor(CreateAuthorDto author);
+    Long createAuthor(RegistrationRequestDto author);
     void updateAuthor(Long id, UpdateAuthorDto author);
     void updateAuthorPassword(Long id, PasswordDto password);
     Author deleteAuthor(Long id);
     Author getAuthorByEmail(String email);
-    void updateAuthorImageUrl(Long id,AuthorImageUrlDto imageUrl);
+    void addAuthorImage(Long id, MultipartFile imageUrl);
     void updateAuthorSubscriptions(Long authorId,Long subscriptionId);
+    void deleteImage(Long id);
 }

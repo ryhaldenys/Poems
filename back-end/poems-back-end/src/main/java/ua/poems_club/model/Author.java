@@ -33,8 +33,7 @@ public class Author {
 
     private String description;
 
-    @Column(nullable = false)
-    private String imageUrl;
+    private String imageName;
 
     @Column(nullable = false,unique = true)
     private String email;
@@ -127,7 +126,7 @@ public class Author {
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", description='" + description + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
+                ", imageUrl='" + imageName + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

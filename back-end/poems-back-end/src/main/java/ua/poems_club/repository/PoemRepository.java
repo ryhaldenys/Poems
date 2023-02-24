@@ -39,4 +39,20 @@ public interface PoemRepository extends JpaRepository<Poem,Long> {
             "from Poem p join p.author a left join p.likes l where a.id =?1 " +
             "group by p.id,a.fullName")
     Page<PoemsDto> findAllByAuthorId(Long authorId,Long currentUserId, Pageable pageable);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Query("select p from Poem p where p.author.id =?1 and p.id=?2")
+    Optional<Poem> findPoemByAuthorIdAndId(Long id, Long poemId);
+
+    @QueryHints(
+            @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
+    @Query("select p from Poem p left join fetch p.likes where p.author.id =?1 and p.id=?2")
+    Optional<Poem> findPoemByAuthorIdAndIdFetchLikes(Long id, Long poemId);
+
+
+    @QueryHints(
+            @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
+    @Query("select p from Poem p left join fetch p.likes where p.id =?1")
+    Optional<Poem> findPoemByIdFetchLikes(Long poemId);
 }
