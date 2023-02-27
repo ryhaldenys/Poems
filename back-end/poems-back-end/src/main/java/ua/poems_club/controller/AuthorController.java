@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.poems_club.dto.author.*;
+import ua.poems_club.dto.poem.PoemsDto;
 import ua.poems_club.model.Author;
 import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.AuthorService;
@@ -50,7 +51,6 @@ public class AuthorController {
                 .build();
     }
 
-
     @PatchMapping("/{id}/password")
     @PreAuthorize("hasAuthority('simple')")
     public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody PasswordDto password){
@@ -62,7 +62,6 @@ public class AuthorController {
                 .location(uri)
                 .build();
     }
-
 
     @PostMapping(value = "/{id}/image",produces = MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(NO_CONTENT)
@@ -90,6 +89,26 @@ public class AuthorController {
     public Author deleteAuthor(@PathVariable Long id){
         return authorService.deleteAuthor(id);
     }
+
+
+    @GetMapping("/{id}/subscriptions")
+    public Page<AuthorsDto> getSubscriptions(@PathVariable Long id,Pageable pageable){
+        return authorService.getAuthorSubscriptions(id,pageable);
+    }
+
+    @GetMapping("/{id}/subscribers")
+    public Page<AuthorsDto> getSubscribers(@PathVariable Long id,Pageable pageable){
+        return authorService.getAuthorSubscribers(id,pageable);
+    }
+
+
+    @GetMapping("/{id}/likes")
+    public Page<PoemsDto> getLikes(@PathVariable Long id,Pageable pageable){
+        return authorService.getAuthorLikes(id,pageable);
+    }
+
 }
+
+
 
 

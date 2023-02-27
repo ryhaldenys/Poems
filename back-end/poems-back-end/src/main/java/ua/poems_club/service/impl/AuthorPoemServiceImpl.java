@@ -15,6 +15,10 @@ import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.repository.PoemRepository;
 import ua.poems_club.service.AuthorPoemService;
 
+import java.util.Arrays;
+
+import static ua.poems_club.model.Poem.*;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -23,13 +27,12 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     private final AuthorRepository authorRepository;
 
     @Override
-    public Page<PoemsDto> getAllByAuthorId(Long authorId,Long currentUserId, Pageable pageable) {
-        return getAll(authorId,currentUserId,pageable);
+    public Page<PoemsDto> getAllPublicPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable) {
+        return getAllPublicPoems(authorId,currentUserId,pageable);
     }
 
-
-    private Page<PoemsDto> getAll(Long id,Long currentUserId, Pageable pageable) {
-        var poems =  poemRepository.findAllByAuthorId(id,currentUserId,pageable);
+    private Page<PoemsDto> getAllPublicPoems(Long id, Long currentUserId, Pageable pageable) {
+        var poems =  poemRepository.findAllPublicPoemsByAuthorId(id,currentUserId,pageable);
         checkPoemsPageIsNotEmpty(poems);
         return poems;
     }
@@ -40,6 +43,19 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
         }
     }
 
+
+    @Override
+    public Page<PoemsDto> getAllPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable) {
+        return getAllPoems(authorId, currentUserId, pageable);
+    }
+
+    private Page<PoemsDto> getAllPoems(Long authorId, Long currentUserId, Pageable pageable){
+        var poems = poemRepository.findAllPoemsByAuthorId(authorId,currentUserId,pageable);
+        checkPoemsPageIsNotEmpty(poems);
+        return poems;
+    }
+
+
     @Override
     @Transactional
     public void createPoem(Long authorId, RequestPoemDto poem) {
@@ -48,10 +64,23 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     }
 
     private Poem createInstanceOfPoem(RequestPoemDto poem){
+        var status = getStatus(poem.status());
         return PoemBuilder.builder()
                 .name(poem.name())
                 .text(poem.text())
+                .status(status)
                 .build();
+    }
+
+    private Status getStatus(String status){
+        if (statusIsCorrect(status))
+             return Status.valueOf(status);
+
+        return Status.PRIVATE;
+    }
+
+    private boolean statusIsCorrect(String status){
+        return Arrays.stream(Status.values()).anyMatch(s-> s.name().equals(status));
     }
 
     private void savePoem(Long authorId, Poem newPoem){
@@ -75,6 +104,8 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     private void updatePoem(Poem poem, RequestPoemDto request) {
         poem.setName(request.name());
         poem.setText(request.text());
+        var status  = getStatus(request.status());
+        poem.setStatus(status);
     }
 
 
@@ -82,7 +113,13 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Transactional
     public void deletePoem(Long id, Long poemId) {
         var poem = getPoemByAuthorIdAndIdFetchLikes(id,poemId);
-        deletePoem(poem);
+        deleteLikes(poem);
+        deletePoem(poemId);
+    }
+
+    private void deleteLikes(Poem poem) {
+        var likes = poem.getLikes();
+        poem.removeAllLikes(likes);
     }
 
     private Poem getPoemByAuthorIdAndIdFetchLikes(Long id, Long poemId) {
@@ -90,8 +127,8 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
                 .orElseThrow(()->new NotFoundException("Cannot find poem by author id: "+id+" and poem id: "+poemId));
     }
 
-    void deletePoem(Poem poem){
-        poemRepository.delete(poem);
+    void deletePoem(Long poemId){
+        poemRepository.deleteById(poemId);
     }
 
     @Override

@@ -6,7 +6,8 @@ import ua.poems_club.dto.poem.RequestPoemDto;
 import ua.poems_club.dto.poem.PoemsDto;
 
 public interface AuthorPoemService {
-    Page<PoemsDto> getAllByAuthorId(Long authorId,Long currentUserId, Pageable pageable);
+    Page<PoemsDto> getAllPublicPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable);
+    Page<PoemsDto> getAllPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable);
     void createPoem(Long authorId, RequestPoemDto poem);
     void updatePoem(Long id, Long poemId, RequestPoemDto poem);
 

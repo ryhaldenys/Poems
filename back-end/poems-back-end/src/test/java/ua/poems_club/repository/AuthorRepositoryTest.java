@@ -2,7 +2,6 @@ package ua.poems_club.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -34,7 +33,7 @@ public class AuthorRepositoryTest {
     }
 
     @Test
-    void findAllAuthors(){
+    void findAllAuthorsTest(){
         author = authors.get(0);
         var currentUser = authors.get(1);
         var pageable = Pageable.unpaged();
@@ -48,7 +47,7 @@ public class AuthorRepositoryTest {
 
 
     @Test
-    void findAuthorById(){
+    void findAuthorByIdTest(){
         author = authors.get(3);
 
         var foundAuthor = authorRepository.findAuthorById(author.getId())
@@ -59,7 +58,7 @@ public class AuthorRepositoryTest {
     }
 
     @Test
-    void findAuthorFetchSubscriptionsById(){
+    void findAuthorFetchSubscriptionsByIdTest(){
         author = authors.get(0);
 
         var foundAuthor = authorRepository.findAuthorFetchSubscriptions(author.getId())
@@ -71,7 +70,7 @@ public class AuthorRepositoryTest {
     }
 
     @Test
-    void findAuthorFetchSubscribersById(){
+    void findAuthorFetchSubscribersByIdTest(){
         author = authors.get(1);
 
         var foundAuthor = authorRepository.findAuthorFetchSubscribers(author.getId())
@@ -82,5 +81,35 @@ public class AuthorRepositoryTest {
     }
 
 
+    @Test
+    void findAllAuthorSubscriptions(){
+        author = authors.get(0);
+        var subscriptions = authorRepository
+                .findAllSubscriptions(author.getId(),Pageable.unpaged())
+                .getContent();
+
+        var firstAuthorSubscription = authors.get(1);
+        var secondAuthorSubscription = authors.get(2);
+
+        assertThat(subscriptions.get(0).getFullName())
+                .isEqualTo(firstAuthorSubscription.getFullName());
+
+        assertThat(subscriptions.get(1).getFullName())
+                .isEqualTo(secondAuthorSubscription.getFullName());
+    }
+
+
+    @Test
+    void findAllAuthorSubscribers(){
+        author = authors.get(1);
+        var subscribers = authorRepository
+                .findAllSubscribers(author.getId(),Pageable.unpaged())
+                .getContent();
+
+        var authorSubscribers = authors.get(0);
+
+        assertThat(subscribers.get(0).getFullName())
+                .isEqualTo(authorSubscribers.getFullName());
+    }
 }
 

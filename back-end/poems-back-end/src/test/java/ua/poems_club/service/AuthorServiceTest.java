@@ -2,7 +2,6 @@ package ua.poems_club.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +17,24 @@ import org.springframework.util.FileSystemUtils;
 import ua.poems_club.dto.author.PasswordDto;
 import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
+import ua.poems_club.exception.IncorrectAuthorDetailsException;
+import ua.poems_club.exception.InvalidImagePathException;
 import ua.poems_club.exception.NotFoundException;
-import ua.poems_club.generator.AuthorGenerator;
 import ua.poems_club.model.Author;
+import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
+import ua.poems_club.security.dto.RegistrationRequestDto;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static ua.poems_club.generator.AuthorGenerator.generateAuthorWithoutId;
+import static ua.poems_club.generator.AuthorGenerator.generateAuthorsWithoutId;
+import static ua.poems_club.generator.PoemGenerator.generatePoemsWithoutId;
+import static ua.poems_club.model.Poem.Status.PRIVATE;
 
 @SpringBootTest
 @RequiredArgsConstructor
@@ -42,17 +49,14 @@ public class AuthorServiceTest {
     @Autowired
     private AuthorRepository authorRepository;
     private List<Author> authors;
+    private List<Poem> poems;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    @Value("${file.path}")
-    private String filePath;
-
     @BeforeEach
     void setUp() {
-        authors = AuthorGenerator.generateAuthorsWithoutId(5);
-        authorRepository.saveAll(authors);
+        addDataToDB();
     }
 
     @Test
@@ -106,6 +110,39 @@ public class AuthorServiceTest {
     }
 
     @Test
+    void createAuthorTest(){
+
+        var request = new RegistrationRequestDto("fullName","email","password");
+
+        var id = authorService.createAuthor(request);
+        authorRepository.flush();
+
+        var optionalAuthor = authorRepository.findById(id);
+
+        assertThat(optionalAuthor.isPresent()).isTrue();
+    }
+
+    @Test
+    void createAuthorByEmailWhichAlreadyExistTest(){
+        var author = authors.get(1);
+        var request = new RegistrationRequestDto("fullName",author.getEmail(),"password");
+
+        assertThatThrownBy(()->authorService.createAuthor(request))
+                .isInstanceOf(AuthorAlreadyExist.class);
+
+    }
+
+    @Test
+    void createAuthorByFullNameWhichAlreadyExistTest(){
+        var author = authors.get(1);
+        var request = new RegistrationRequestDto(author.getFullName(),"new-email","password");
+
+        assertThatThrownBy(()->authorService.createAuthor(request))
+                .isInstanceOf(AuthorAlreadyExist.class);
+
+    }
+
+    @Test
     void updateAbsentAuthorTest(){
         var id = 121312423L;
         var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello");
@@ -153,6 +190,19 @@ public class AuthorServiceTest {
     }
 
     @Test
+    void updatePasswordByWrongIdTest(){
+        var author = authors.get(1);
+
+        author.setPassword(encoder.encode(author.getPassword()));
+
+        var password = new PasswordDto("wrongOldPassword","newpassword");
+
+        assertThatThrownBy(()->authorService.updateAuthorPassword(author.getId(),password))
+                .isInstanceOf(IncorrectAuthorDetailsException.class);
+
+    }
+
+    @Test
     void getAuthorByEmailTest(){
         var author = authors.get(0);
         var foundAuthor = authorService.getAuthorByEmail(author.getEmail());
@@ -166,19 +216,20 @@ public class AuthorServiceTest {
 
     @Test
     void deleteAuthorTest(){
-        var author = authors.get(0);
+        var author = authors.get(1);
 
         authorService.deleteAuthor(author.getId());
         authorRepository.flush();
 
         boolean isAuthor = authorRepository.findById(author.getId()).isPresent();
+
         assertThat(isAuthor).isFalse();
     }
 
 
     @SneakyThrows
     @Test
-    void updateAuthorImageUrlTest(){
+    void addAuthorImageTest(){
         var author = authors.get(2);
 
         MockMultipartFile multipartFile = new MockMultipartFile("file",
@@ -193,10 +244,21 @@ public class AuthorServiceTest {
         FileSystemUtils.deleteRecursively(Path.of(uploadPath + "/" + foundAuthor.getImageName()));
     }
 
+
+    @SneakyThrows
+    @Test
+    void addAuthorImageByWrongPathTest(){
+        var author = authors.get(2);
+
+        assertThatThrownBy(()->authorService.addAuthorImage(author.getId(), null))
+                .isInstanceOf(InvalidImagePathException.class);
+
+    }
+
     @Test
     void addSubscriptionTest(){
         var author = authors.get(0);
-        var subscription = authors.get(1);
+        var subscription = authors.get(4);
         authorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
         authorRepository.flush();
 
@@ -219,8 +281,96 @@ public class AuthorServiceTest {
         assertThat(foundAuthor.getSubscriptions().contains(subscription)).isFalse();
     }
 
-    @AfterEach
-    void tearDown() {
-        authorRepository.deleteAll();
+
+    @Test
+    @SneakyThrows
+    void deleteImageTest(){
+        var author = authors.get(0);
+
+        File file = new File(uploadPath+"/"+author.getImageName());
+        var fileIsCreated =  file.createNewFile();
+
+        var foundAuthor = authorRepository.findById(author.getId())
+                .orElseThrow();
+
+        authorService.deleteImage(author.getId());
+        authorRepository.flush();
+
+        assertThat(fileIsCreated).isTrue();
+        assertThat(file.exists()).isFalse();
+        assertThat(foundAuthor.getImageName()).isNull();
+
+    }
+
+
+    @Test
+    void getAuthorSubscriptionsTest(){
+        var author = authors.get(0);
+
+        var subscriptions = authorService
+                .getAuthorSubscriptions(author.getId(),Pageable.unpaged())
+                .getContent();
+
+        var firstAuthorSubscription = authors.get(1);
+        var secondAuthorSubscription = authors.get(2);
+
+        assertThat(subscriptions.get(0).getFullName())
+                .isEqualTo(firstAuthorSubscription.getFullName());
+
+        assertThat(subscriptions.get(1).getFullName())
+                .isEqualTo(secondAuthorSubscription.getFullName());
+    }
+
+
+    @Test
+    void getAuthorSubscribersTest(){
+        var author = authors.get(1);
+
+        var subscribers = authorService
+                .getAuthorSubscribers(author.getId(),Pageable.unpaged())
+                .getContent();
+
+        var subscriber = authors.get(0);
+
+        assertThat(subscribers.get(0).getFullName())
+                .isEqualTo(subscriber.getFullName());
+    }
+
+    @Test
+    void getAuthorLikesTest(){
+        var author = authors.get(0);
+
+        var likes = authorService
+                .getAuthorLikes(author.getId(),Pageable.unpaged())
+                .getContent();
+
+        assertThat(likes.get(0).getName())
+                .isEqualTo(poems.get(0).getName());
+
+        assertThat(likes.get(1).getName())
+                .isNotEqualTo(poems.get(1).getName());
+    }
+
+    private void addDataToDB(){
+        authors = generateAuthorsWithoutId(5);
+        poems = generatePoemsWithoutId(5);
+        poems.get(1).setStatus(PRIVATE);
+
+        for (int i = 0; i < authors.size(); i++) {
+            poems.get(i).addAuthor(authors.get(i));
+        }
+        authorRepository.saveAll(authors);
+
+        authors.get(0).addAllLikes(new HashSet<>(poems));
+
+        authors.get(0).addSubscription(authors.get(1));
+        authors.get(0).addSubscription(authors.get(2));
+        authors.get(0).addSubscription(authors.get(2));
+        authors.get(3).addSubscriber(authors.get(0));
+
+        Author currentUser = generateAuthorWithoutId();
+        authorRepository.save(currentUser);
+        currentUser.addLike(poems.get(1));
+        authorRepository.flush();
     }
 }

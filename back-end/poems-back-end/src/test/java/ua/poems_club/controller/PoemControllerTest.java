@@ -47,20 +47,18 @@ public class PoemControllerTest {
     @MockBean
     private JwtTokenProvider tokenProvider;
 
-    private List<Author> authors;
     private List<Poem> poems;
-    private Author author;
     private UserDetails securityUser;
 
     @BeforeEach
     void setUp() {
         securityUser = SecurityUser.fromUser(generateAuthorWithId());
-        authors = generateAuthorsWithId(5);
+        List<Author> authors = generateAuthorsWithId(5);
         poems = generatePoemsWithId(5);
         for (int i = 0; i < authors.size(); i++) {
             authors.get(i).addPoem(poems.get(i));
         }
-        author = authors.get(0);
+        Author author = authors.get(0);
     }
 
     @Test
@@ -127,12 +125,12 @@ public class PoemControllerTest {
 
     private List<PoemsDto> mapToPoemsDto(List<Poem>poems) {
         return poems.stream().map((p)-> new PoemsDto(p.getId(),p.getName(),p.getText(),p.getAuthor().getId(),
-                        p.getAuthor().getFullName(),(long) p.getLikes().size(),false))
+                        p.getStatus(),p.getAuthor().getFullName(),(long) p.getLikes().size(),false))
                 .collect(Collectors.toList());
     }
 
     private PoemDto mapToPoemDto(Poem poem) {
-        return new PoemDto(poem.getId(), poem.getName(), poem.getText(), poem.getAuthor().getId(),
+        return new PoemDto(poem.getId(), poem.getName(), poem.getText(),poem.getStatus(), poem.getAuthor().getId(),
                 poem.getAuthor().getFullName());
     }
 

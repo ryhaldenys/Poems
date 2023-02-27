@@ -50,6 +50,17 @@ public class Author {
     @Enumerated(EnumType.STRING)
     private Status status = ACTIVE;
 
+    public void removeAllMyLikes(Set<Poem> myLikes) {
+        myLikes.forEach(m->m.getLikes().remove(this));
+        this.myLikes.removeAll(myLikes);
+
+    }
+
+    public void removeAllPoems(List<Poem> poems) {
+        this.poems.removeAll(poems);
+        poems.forEach(m->m.setAuthor(null));
+    }
+
     public enum Status{
         ACTIVE,BLOCKED
     }
@@ -59,11 +70,15 @@ public class Author {
     private List<Poem> poems = new ArrayList<>();
 
     @Setter(AccessLevel.PRIVATE)
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "subscriptions")
+    @ManyToMany(mappedBy = "subscriptions",cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+//    @JoinTable(name = "user_subscribers",
+//            joinColumns = @JoinColumn(name = "channel_id"),
+//            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+//    )
     private Set<Author> subscribers = new HashSet<>();
 
     @Setter(AccessLevel.PRIVATE)
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(name = "user_subscribers",
             joinColumns = @JoinColumn(name = "subscriber_id"),
             inverseJoinColumns = @JoinColumn(name = "channel_id")
@@ -71,7 +86,7 @@ public class Author {
     private Set<Author> subscriptions = new HashSet<>();
 
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "likes")
+    @ManyToMany(cascade = CascadeType.REMOVE,mappedBy = "likes")
     private Set<Poem> myLikes = new HashSet<>();
 
     public void addPoem(Poem poem){
@@ -79,9 +94,15 @@ public class Author {
         poem.setAuthor(this);
     }
 
-    public void addAllPoems(List<Poem>poems){
-        this.poems = poems;
-        poems.forEach(p -> p.setAuthor(this));
+    public void removeAllSubscribers(Set<Author>authors){
+        authors.forEach(a->a.getSubscriptions().remove(this));
+        subscribers.removeAll(authors);
+    }
+
+
+    public void removeAllSubscriptions(Set<Author>authors){
+        authors.forEach(a->a.getSubscribers().remove(this));
+        subscriptions.removeAll(authors);
     }
 
     public void addSubscriber(Author author){
@@ -89,20 +110,9 @@ public class Author {
         author.getSubscriptions().add(this);
     }
 
-    public void addAllSubscribers(Set<Author>subscribers){
-        this.subscribers = subscribers;
-        subscribers.forEach(s->s.getSubscriptions().add(this));
-    }
-
     public void addSubscription(Author author){
         this.subscriptions.add(author);
         author.getSubscribers().add(this);
-    }
-
-
-    public void addAllSubscriptions(Set<Author>subscriptions){
-        this.subscriptions = subscriptions;
-        subscribers.forEach(s->s.getSubscribers().add(this));
     }
 
     public void addAllLikes(Set<Poem>likes){

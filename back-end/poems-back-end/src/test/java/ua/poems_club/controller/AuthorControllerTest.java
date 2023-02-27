@@ -19,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import ua.poems_club.dto.author.*;
+import ua.poems_club.dto.poem.PoemsDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.NotFoundException;
@@ -42,10 +43,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ua.poems_club.model.Poem.Status.*;
 
 @WithMockUser
 @WebMvcTest(AuthorController.class)
 public class AuthorControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -67,9 +70,7 @@ public class AuthorControllerTest {
     @SneakyThrows
     @Test
     void getAllAuthorsTest(){
-        var authorsDtos = authors.stream().map(a -> new AuthorsDto(a.getId(),a.getFullName(),a.getDescription()
-                ,a.getImageName(), (long) a.getSubscribers().size(), (long) a.getPoems().size(),false))
-                .toList();
+        var authorsDtos = mapToAuthorsDto(authors);
         Page<AuthorsDto> page = new PageImpl<>(authorsDtos);
 
         when(service.getAllAuthors(anyLong(),any(Pageable.class)))
@@ -252,10 +253,113 @@ public class AuthorControllerTest {
     }
 
 
+    @Test
+    @SneakyThrows
+    void getSubscriptionsTest(){
+        var subscriptions = mapToAuthorsDto(List.of(authors.get(0)));
+
+        when(service.getAuthorSubscriptions(anyLong(),any(Pageable.class)))
+                .thenReturn(new PageImpl<>(subscriptions));
+
+        mockMvc.perform(get("/api/authors/1/subscriptions")
+                        .with(user(currentUser)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].fullName",is(subscriptions.get(0).getFullName())))
+                .andExpect(jsonPath("$.content[0].imagePath",is(subscriptions.get(0).getImagePath())));
+    }
+
+    @Test
+    @SneakyThrows
+    void getSubscriptionsWhenTheyAreNotExistTest(){
+
+        when(service.getAuthorSubscriptions(anyLong(),any(Pageable.class)))
+                .thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/api/authors/1/subscriptions")
+                        .with(user(currentUser)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(r-> assertThat(r.getResolvedException())
+                        .isInstanceOf(NotFoundException.class));
+    }
+
+
+    @Test
+    @SneakyThrows
+    void getSubscribersTest(){
+        var subscriptions = mapToAuthorsDto(List.of(authors.get(0)));
+
+        when(service.getAuthorSubscribers(anyLong(),any(Pageable.class)))
+                .thenReturn(new PageImpl<>(subscriptions));
+
+        mockMvc.perform(get("/api/authors/1/subscribers")
+                        .with(user(currentUser)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].fullName",is(subscriptions.get(0).getFullName())))
+                .andExpect(jsonPath("$.content[0].imagePath",is(subscriptions.get(0).getImagePath())));
+    }
+
+    @Test
+    @SneakyThrows
+    void getSubscribersWhenTheyAreNotExistDbTest(){
+        when(service.getAuthorSubscribers(anyLong(),any(Pageable.class)))
+                .thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/api/authors/1/subscribers")
+                        .with(user(currentUser)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(r-> assertThat(r.getResolvedException())
+                        .isInstanceOf(NotFoundException.class));
+    }
+
+
+    @Test
+    @SneakyThrows
+    void getLikesTest(){
+        var likes = List.of(new PoemsDto(1L,"name","text",
+                1L, PUBLIC,"author",2L,1L));
+
+        when(service.getAuthorLikes(anyLong(),any(Pageable.class)))
+                .thenReturn(new PageImpl<>(likes));
+
+        mockMvc.perform(get("/api/authors/1/likes")
+                        .with(user(currentUser)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name",is(likes.get(0).getName())))
+                .andExpect(jsonPath("$.content[0].text",is(likes.get(0).getText())));
+    }
+
+    @Test
+    @SneakyThrows
+    void getLikesWhenTheyAreNotExistTest(){
+
+        when(service.getAuthorLikes(anyLong(),any(Pageable.class)))
+                .thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/api/authors/1/likes")
+                        .with(user(currentUser)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(r-> assertThat(r.getResolvedException())
+                        .isInstanceOf(NotFoundException.class));
+    }
+
+
+
     @SneakyThrows
     private<T> String mapObjectToString(T author){
         var objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         return objectMapper.writeValueAsString(author);
+    }
+
+    private List<AuthorsDto> mapToAuthorsDto(List<Author>authors){
+        return authors.stream().map(a -> new AuthorsDto(a.getId(),a.getFullName(),a.getDescription()
+                        ,a.getImageName(), (long) a.getSubscribers().size(), (long) a.getPoems().size(),false))
+                .toList();
     }
 }

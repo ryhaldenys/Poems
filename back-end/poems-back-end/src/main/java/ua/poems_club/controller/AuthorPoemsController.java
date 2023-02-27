@@ -3,7 +3,6 @@ package ua.poems_club.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +22,13 @@ public class AuthorPoemsController {
 
     @GetMapping
     public Page<PoemsDto> getAllPoemsOfAuthor(@PathVariable Long id, Pageable pageable,@AuthenticationPrincipal SecurityUser currentUser){
-        return authorPoemService.getAllByAuthorId(id,currentUser.getId(),pageable);
+        return authorPoemService.getAllPublicPoemsByAuthorId(id,currentUser.getId(),pageable);
     }
 
     @GetMapping("/own")
     @PreAuthorize("authentication.principal.id == #id")
     public Page<PoemsDto> getAllPoemsOfCurrentAuthor(@PathVariable Long id, Pageable pageable){
-        return authorPoemService.getAllByAuthorId(id,id,pageable);
+        return authorPoemService.getAllPoemsByAuthorId(id,id,pageable);
     }
 
     @PostMapping
@@ -42,7 +41,7 @@ public class AuthorPoemsController {
     @PutMapping("/{poem_id}")
     @PreAuthorize("authentication.principal.id == #id")
     @ResponseStatus(NO_CONTENT)
-    public void updatePoem(@PathVariable Long id, @PathVariable("poem_id") Long poemId,RequestPoemDto poem){
+    public void updatePoem(@PathVariable Long id, @PathVariable("poem_id") Long poemId,@RequestBody RequestPoemDto poem){
         authorPoemService.updatePoem(id,poemId,poem);
     }
 

@@ -1,6 +1,6 @@
 package ua.poems_club.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static jakarta.persistence.FetchType.*;
 import static java.time.LocalDateTime.*;
+import static ua.poems_club.model.Poem.Status.*;
 
 
 @Getter
@@ -36,7 +37,15 @@ public class Poem {
     @Column(nullable = false)
     private LocalDateTime createdAt = now();
 
-    @JsonIgnore
+    @Enumerated(EnumType.STRING)
+    private Status status = PRIVATE;
+
+    public enum Status{
+        PUBLIC, PRIVATE
+
+    }
+
+
     @ManyToOne(optional = false,fetch = LAZY)
     @JoinColumn(name = "author_id")
     private Author author;
@@ -62,9 +71,9 @@ public class Poem {
         author.getMyLikes().remove(this);
     }
 
-    public void addAllLikes(Set<Author> likes){
-        this.likes = likes;
-        likes.forEach(l->l.getMyLikes().add(this));
+    public void removeAllLikes(Set<Author> authors){
+        this.likes.removeAll(authors);
+        authors.forEach(a->a.getMyLikes().remove(this));
     }
 
     @Override

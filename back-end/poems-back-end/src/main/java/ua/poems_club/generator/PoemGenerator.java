@@ -19,6 +19,7 @@ public class PoemGenerator {
         return PoemBuilder.builder()
                 .name("name"+identifier)
                 .text("text"+identifier)
+                .status(Poem.Status.PUBLIC)
                 .build();
     }
 
@@ -32,6 +33,7 @@ public class PoemGenerator {
                 .id(identifier)
                 .name("name"+identifier)
                 .text("text"+identifier)
+                .status(Poem.Status.PUBLIC)
                 .build();
     }
 

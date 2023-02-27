@@ -11,12 +11,15 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ua.poems_club.builder.AuthorBuilder;
 import ua.poems_club.dto.author.*;
+import ua.poems_club.dto.poem.PoemsDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.InvalidImagePathException;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
+import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
+import ua.poems_club.repository.PoemRepository;
 import ua.poems_club.security.dto.RegistrationRequestDto;
 import ua.poems_club.service.AuthorService;
 
@@ -41,6 +44,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Value("${default.image}")
     private String defaultImage;
+    private final PoemRepository poemRepository;
 
 
     @Override
@@ -52,9 +56,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     private Page<AuthorsDto> getAll(Long currentAuthorId, Pageable pageable){
         var authors = authorRepository.findAllAuthors(currentAuthorId,pageable);
-        if(authors.getContent().isEmpty()){
-            throw new NotFoundException("Cannot find any authors");
-        }
+        checkAreAuthors(authors);
         return authors;
     }
 
@@ -186,17 +188,51 @@ public class AuthorServiceImpl implements AuthorService {
         return new NotFoundException("Cannot find an author by id: "+id);
     }
 
+
     @Override
     @Transactional
     public Author deleteAuthor(Long id) {
-        var author = getAuthor(id);
-        removeAuthor(id);
-        return author;
+        var author = getAuthorFetchAllFields(id);
+        deleteSubscribers(author);
+        deleteSubscriptions(author);
+        deletePoemsWithLikes(author);
+        deleteMyLikes(author);
+        authorRepository.deleteById(id);
+        return null;
     }
 
-    private void removeAuthor(Long id) {
-        authorRepository.deleteById(id);
+    private void deleteSubscribers(Author author) {
+        var subscribers = author.getSubscribers();
+        author.removeAllSubscribers(subscribers);
     }
+
+    private void deleteSubscriptions(Author author) {
+        var subscribers = author.getSubscriptions();
+        author.removeAllSubscriptions(subscribers);
+    }
+
+    private void deletePoemsWithLikes(Author author) {
+        var poems = author.getPoems();
+        poems.forEach(this::deletePoemLikes);
+        author.removeAllPoems(poems);
+    }
+
+    private void deletePoemLikes(Poem poem) {
+        var likes = poem.getLikes();
+        poem.removeAllLikes(likes);
+    }
+    private void deleteMyLikes(Author author) {
+        var myLikes = author.getMyLikes();
+        author.removeAllMyLikes(myLikes);
+    }
+
+
+
+    private Author getAuthorFetchAllFields(Long id){
+        return authorRepository.findAuthorByIdFetchAllFields(id)
+                .orElseThrow();
+    }
+
 
     @Override
     public Author getAuthorByEmail(String email) {
@@ -323,6 +359,54 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.findAuthorFetchSubscribers(subscriptionId)
                 .orElseThrow(()->throwNotFoundAuthorById(subscriptionId));
     }
+
+    @Override
+    public Page<AuthorsDto> getAuthorSubscriptions(Long id,Pageable pageable) {
+        return getSubscriptions(id,pageable);
+    }
+
+    private Page<AuthorsDto> getSubscriptions(Long id,Pageable pageable){
+        var subscriptions = authorRepository.findAllSubscriptions(id,pageable);
+        checkAreAuthors(subscriptions);
+        return subscriptions;
+    }
+
+    @Override
+    public Page<AuthorsDto> getAuthorSubscribers(Long id,Pageable pageable) {
+        return getSubscribers(id,pageable);
+    }
+
+    private Page<AuthorsDto> getSubscribers(Long id,Pageable pageable){
+        var subscriptions = authorRepository.findAllSubscribers(id,pageable);
+        checkAreAuthors(subscriptions);
+        return subscriptions;
+    }
+
+
+    private void checkAreAuthors(Page<AuthorsDto> authors) {
+        if(authors.getContent().isEmpty()){
+            throw new NotFoundException("Cannot find any authors");
+        }
+    }
+
+    @Override
+    public Page<PoemsDto> getAuthorLikes(Long id,Pageable pageable) {
+        return getLikes(id,pageable);
+    }
+
+    private Page<PoemsDto> getLikes(Long id,Pageable pageable){
+        var likes = poemRepository.findAllAuthorLikes(id,pageable);
+        checkArePoems(likes);
+        return likes;
+    }
+
+    private void checkArePoems(Page<PoemsDto> poems){
+        if(poems.getContent().isEmpty()){
+            throw new NotFoundException("Cannot find any poems");
+        }
+    }
+
+
 }
 
 

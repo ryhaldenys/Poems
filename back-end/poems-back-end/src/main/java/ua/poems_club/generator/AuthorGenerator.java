@@ -48,7 +48,7 @@ public class AuthorGenerator  {
                 .description("description"+identifier)
                 .email("email"+identifier+"@gmail.com")
                 .password("password"+identifier)
-                .imageUrl("url"+identifier)
+                .imageUrl("image"+identifier+".png")
                 .build();
     }
 

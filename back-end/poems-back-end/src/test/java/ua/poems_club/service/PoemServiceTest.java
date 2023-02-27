@@ -1,6 +1,5 @@
 package ua.poems_club.service;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,14 +23,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles(profiles = "test")
 @Transactional
 public class PoemServiceTest {
-    @Autowired
-    private PoemRepository poemRepository;
     @Autowired
     private PoemService poemService;
     @Autowired
@@ -58,7 +54,7 @@ public class PoemServiceTest {
 
     private List<PoemsDto> mapToPoemsDto(Author currentUser,List<Poem>poems) {
         return poems.stream().map((p)-> new PoemsDto(p.getId(),p.getName(),p.getText(),p.getAuthor().getId(),
-                        p.getAuthor().getFullName(),(long) p.getLikes().size(),p.getLikes().contains(currentUser)))
+                        p.getStatus(),p.getAuthor().getFullName(),(long) p.getLikes().size(),p.getLikes().contains(currentUser)))
                 .collect(Collectors.toList());
     }
 
