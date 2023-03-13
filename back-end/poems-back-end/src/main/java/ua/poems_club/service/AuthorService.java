@@ -11,8 +11,8 @@ import ua.poems_club.security.dto.RegistrationRequestDto;
 public interface AuthorService {
     Page<AuthorsDto> getAllAuthors(Long id,Pageable pageable);
     AuthorDto getAuthorById(Long id);
-    Long createAuthor(RegistrationRequestDto author);
-    void updateAuthor(Long id, UpdateAuthorDto author);
+    Author createAuthor(RegistrationRequestDto author);
+    Author updateAuthor(Long id, UpdateAuthorDto author);
     void updateAuthorPassword(Long id, PasswordDto password);
     Author deleteAuthor(Long id);
     Author getAuthorByEmail(String email);

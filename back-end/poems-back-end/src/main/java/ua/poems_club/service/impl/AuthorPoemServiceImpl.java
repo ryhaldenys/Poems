@@ -146,17 +146,15 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
                 .orElseThrow(()->new NotFoundException("Cannot find poem by id:"+poemId));
     }
 
+    private Author getAuthorByIdFetchLikes(Long likeId){
+        return authorRepository.findByIdFetchLikes(likeId)
+                .orElseThrow(()->new NotFoundException("Cannot find author by id: "+likeId));
+    }
+
     private void updatePoemLikes(Poem poem, Author like) {
         if (poem.getLikes().contains(like)){
             poem.removeLike(like);
         }else
             poem.addLike(like);
     }
-
-    private Author getAuthorByIdFetchLikes(Long likeId){
-        return authorRepository.findByIdFetchLikes(likeId)
-                .orElseThrow(()->new NotFoundException("Cannot find author by id: "+likeId));
-    }
-
-
 }

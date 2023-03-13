@@ -20,7 +20,9 @@ import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.repository.PoemRepository;
+import ua.poems_club.security.dto.AuthenticationResponseDto;
 import ua.poems_club.security.dto.RegistrationRequestDto;
+import ua.poems_club.security.service.AuthenticationService;
 import ua.poems_club.service.AuthorService;
 
 import java.io.File;
@@ -75,9 +77,14 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorDto getAuthorById(Long id) {
-        var author =  getById(id);
+        var author = getById(id);
         setImagePath(author);
         return author;
+    }
+
+    private AuthorDto getById(Long id){
+        return authorRepository.findAuthorById(id).
+                orElseThrow(()->throwNotFoundAuthorById(id));
     }
 
     private void setImagePath(AuthorDto author) {
@@ -87,23 +94,19 @@ public class AuthorServiceImpl implements AuthorService {
             author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
     }
 
-    private AuthorDto getById(Long id){
-        return authorRepository.findAuthorById(id).
-                orElseThrow(()->throwNotFoundAuthorById(id));
-    }
 
     @Override
     @Transactional
-    public Long createAuthor(RegistrationRequestDto author) {
+    public Author createAuthor(RegistrationRequestDto author) {
         return create(author);
     }
 
-    private Long create(RegistrationRequestDto authorDto){
+    private Author create(RegistrationRequestDto authorDto){
         var author = buildAuthor(authorDto);
         checkAuthorIsExist(author);
         encodePassword(author);
-        authorRepository.save(author);
-        return author.getId();
+
+        return authorRepository.save(author);
     }
 
     private Author buildAuthor(RegistrationRequestDto authorDto){
@@ -116,13 +119,19 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     private void checkAuthorIsExist(Author author) {
-        checkIsAuthorByEmail(author.getEmail());
-        checkIsAuthorByFullName(author.getFullName());
+        checkIsAuthorWithEmail(author.getEmail());
+        checkIsAuthorWithFullName(author.getFullName());
     }
 
-    private void checkIsAuthorByEmail(String email){
+    private void checkIsAuthorWithEmail(String email){
         if (authorRepository.findByEmail(email).isPresent()){
             throw new AuthorAlreadyExist("Author with email: "+email+", already exist");
+        }
+    }
+
+    private void checkIsAuthorWithFullName(String fullName){
+        if (authorRepository.findByFullName(fullName).isPresent()){
+            throw new AuthorAlreadyExist("Author with full name: "+fullName+", already exist");
         }
     }
 
@@ -131,38 +140,40 @@ public class AuthorServiceImpl implements AuthorService {
         author.setPassword(passwordEncoder.encode(password));
     }
 
-    private void checkIsAuthorByFullName(String fullName){
-        if (authorRepository.findByFullName(fullName).isPresent()){
-            throw new AuthorAlreadyExist("Author with full name: "+fullName+", already exist");
-        }
-    }
-
-    //todo: add b2 encoding
-    //todo: default img
 
 
     @Override
     @Transactional
-    public void updateAuthor(Long id, UpdateAuthorDto author) {
+    public Author updateAuthor(Long id, UpdateAuthorDto author) {
         var foundAuthor = getAuthor(id);
-        checkIsAuthorByEmail(author.email());
-        checkIsAuthorByFullName(author.fullName());
-        updateAuthor(foundAuthor,author);
-
-
+        checkIsOtherAuthorWithFullName(foundAuthor,author);
+        checkIsOtherAuthorWithEmail(foundAuthor,author);
+        return updateAuthor(foundAuthor,author);
     }
 
     private Author getAuthor(Long id) {
         return authorRepository.findById(id)
                 .orElseThrow(()->throwNotFoundAuthorById(id));
-
     }
 
-    private void updateAuthor(Author foundAuthor, UpdateAuthorDto author) {
+    private void checkIsOtherAuthorWithFullName(Author foundAuthor, UpdateAuthorDto author) {
+        if(!foundAuthor.getFullName().equals(author.fullName()))
+            checkIsAuthorWithFullName(author.fullName());
+    }
+
+    private void checkIsOtherAuthorWithEmail(Author foundAuthor, UpdateAuthorDto author) {
+        if(!foundAuthor.getEmail().equals(author.email()))
+            checkIsAuthorWithEmail(author.email());
+    }
+
+    private Author updateAuthor(Author foundAuthor, UpdateAuthorDto author) {
         foundAuthor.setFullName(author.fullName());
         foundAuthor.setEmail(author.email());
         foundAuthor.setDescription(author.description());
+        return foundAuthor;
     }
+
+
 
     @Override
     @Transactional
@@ -197,8 +208,13 @@ public class AuthorServiceImpl implements AuthorService {
         deleteSubscriptions(author);
         deletePoemsWithLikes(author);
         deleteMyLikes(author);
-        authorRepository.deleteById(id);
-        return null;
+        deleteAuthorById(id);
+        return author;
+    }
+
+    private Author getAuthorFetchAllFields(Long id){
+        return authorRepository.findAuthorByIdFetchAllFields(id)
+                .orElseThrow();
     }
 
     private void deleteSubscribers(Author author) {
@@ -226,11 +242,8 @@ public class AuthorServiceImpl implements AuthorService {
         author.removeAllMyLikes(myLikes);
     }
 
-
-
-    private Author getAuthorFetchAllFields(Long id){
-        return authorRepository.findAuthorByIdFetchAllFields(id)
-                .orElseThrow();
+    private void deleteAuthorById(Long id){
+        authorRepository.deleteById(id);
     }
 
 
@@ -309,26 +322,15 @@ public class AuthorServiceImpl implements AuthorService {
         updateAuthorSubscriptions(author,subscription);
     }
 
-    @Override
-    @Transactional
-    public void deleteImage(Long id) {
-        delete(id);
+    private Author getAuthorFetchSubscriptions(Long authorId) {
+        return authorRepository.findAuthorFetchSubscriptions(authorId)
+                .orElseThrow(()-> throwNotFoundAuthorById(authorId));
     }
 
-    private void delete(Long id){
-        try {
-            var author = getAuthor(id);
-            deleteOldImageIfItExist(author);
-            setNullImageName(author);
-        } catch (IOException e) {
-            throw new InvalidImagePathException("Invalid image path");
-        }
+    private Author getAuthorFetchSubscribers(Long subscriptionId) {
+        return authorRepository.findAuthorFetchSubscribers(subscriptionId)
+                .orElseThrow(()->throwNotFoundAuthorById(subscriptionId));
     }
-
-    private void setNullImageName(Author author){
-        author.setImageName(null);
-    }
-
 
     private void updateAuthorSubscriptions(Author author, Author subscription) {
         if (checkIsSubscription(author, subscription))
@@ -350,15 +352,29 @@ public class AuthorServiceImpl implements AuthorService {
         author.addSubscription(subscription);
     }
 
-    private Author getAuthorFetchSubscriptions(Long authorId) {
-        return authorRepository.findAuthorFetchSubscriptions(authorId)
-                .orElseThrow(()-> throwNotFoundAuthorById(authorId));
+
+
+
+    @Override
+    @Transactional
+    public void deleteImage(Long id) {
+        delete(id);
     }
 
-    private Author getAuthorFetchSubscribers(Long subscriptionId) {
-        return authorRepository.findAuthorFetchSubscribers(subscriptionId)
-                .orElseThrow(()->throwNotFoundAuthorById(subscriptionId));
+    private void delete(Long id){
+        try {
+            var author = getAuthor(id);
+            deleteOldImageIfItExist(author);
+            setNullImageName(author);
+        } catch (IOException e) {
+            throw new InvalidImagePathException("Invalid image path");
+        }
     }
+
+    private void setNullImageName(Author author){
+        author.setImageName(null);
+    }
+
 
     @Override
     public Page<AuthorsDto> getAuthorSubscriptions(Long id,Pageable pageable) {
@@ -382,7 +398,6 @@ public class AuthorServiceImpl implements AuthorService {
         return subscriptions;
     }
 
-
     private void checkAreAuthors(Page<AuthorsDto> authors) {
         if(authors.getContent().isEmpty()){
             throw new NotFoundException("Cannot find any authors");
@@ -405,8 +420,4 @@ public class AuthorServiceImpl implements AuthorService {
             throw new NotFoundException("Cannot find any poems");
         }
     }
-
-
 }
-
-

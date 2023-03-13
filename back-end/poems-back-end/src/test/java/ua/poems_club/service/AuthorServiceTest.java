@@ -97,7 +97,7 @@ public class AuthorServiceTest {
     @Test
     void updateAuthorTest(){
         var id = authors.get(0).getId();
-        var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello");
+        var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello","password");
         authorService.updateAuthor(id,updateAuthorDto);
         authorRepository.flush();
 
@@ -114,10 +114,10 @@ public class AuthorServiceTest {
 
         var request = new RegistrationRequestDto("fullName","email","password");
 
-        var id = authorService.createAuthor(request);
+        var author = authorService.createAuthor(request);
         authorRepository.flush();
 
-        var optionalAuthor = authorRepository.findById(id);
+        var optionalAuthor = authorRepository.findById(author.getId());
 
         assertThat(optionalAuthor.isPresent()).isTrue();
     }
@@ -145,7 +145,7 @@ public class AuthorServiceTest {
     @Test
     void updateAbsentAuthorTest(){
         var id = 121312423L;
-        var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello");
+        var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello","password");
 
         assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(NotFoundException.class);
@@ -155,7 +155,7 @@ public class AuthorServiceTest {
     void updateUserWithEmailWhichAlreadyExistTest(){
         var id = authors.get(0).getId();
         var email = authors.get(1).getEmail();
-        var updateAuthorDto = new UpdateAuthorDto("Denys Denys",email,"hello");
+        var updateAuthorDto = new UpdateAuthorDto("Denys Denys",email,"hello","password");
 
         assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(AuthorAlreadyExist.class);
@@ -165,7 +165,7 @@ public class AuthorServiceTest {
     void updateUserWithFullNameWhichAlreadyExistTest(){
         var id = authors.get(0).getId();
         var fullName = authors.get(1).getFullName();
-        var updateAuthorDto = new UpdateAuthorDto(fullName,"new@gmail.com","hello");
+        var updateAuthorDto = new UpdateAuthorDto(fullName,"new@gmail.com","hello","password");
 
         assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(AuthorAlreadyExist.class);

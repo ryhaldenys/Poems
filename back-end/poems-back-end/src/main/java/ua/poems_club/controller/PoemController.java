@@ -12,13 +12,12 @@ import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.service.PoemService;
 
 @RestController
-@RequestMapping("api/poems")
+@RequestMapping("/api/poems")
 @RequiredArgsConstructor
 public class PoemController {
     private final PoemService poemService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('simple')")
     public Page<PoemsDto> getAll(@AuthenticationPrincipal SecurityUser author, Pageable pageable, @RequestParam(defaultValue = "")String name){
         return poemService.getAllPoems(author.getId(),pageable,name);
     }

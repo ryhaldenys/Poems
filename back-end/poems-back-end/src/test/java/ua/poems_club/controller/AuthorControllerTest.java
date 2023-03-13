@@ -28,6 +28,7 @@ import ua.poems_club.generator.AuthorGenerator;
 import ua.poems_club.model.Author;
 import ua.poems_club.security.model.JwtTokenProvider;
 import ua.poems_club.security.model.SecurityUser;
+import ua.poems_club.security.service.AuthenticationService;
 import ua.poems_club.service.AuthorService;
 
 import java.util.List;
@@ -54,6 +55,9 @@ public class AuthorControllerTest {
 
     @MockBean
     private AuthorService service;
+
+    @MockBean
+    private AuthenticationService authenticationService;
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
@@ -142,7 +146,7 @@ public class AuthorControllerTest {
                         .content(mapObjectToString(author))
                         .with(csrf()))
                 .andDo(print())
-                .andExpect(status().isNoContent())
+                .andExpect(status().is(201))
                 .andExpect(result -> assertThat(Objects.requireNonNull(result.getResponse().getRedirectedUrl())
                         .contains("http://localhost/api/authors/"))
                         .isTrue()
@@ -153,7 +157,7 @@ public class AuthorControllerTest {
     @SneakyThrows
     void updateAuthorWithFullNameWhichAlreadyExist(){
         var author = authors.get(2);
-        var authorDto = new UpdateAuthorDto(author.getFullName(), author.getEmail(), author.getDescription());
+        var authorDto = new UpdateAuthorDto(author.getFullName(), author.getEmail(), author.getDescription(),author.getPassword());
 
         BDDMockito.willThrow(AuthorAlreadyExist.class).given(service).updateAuthor(author.getId(),authorDto);
 

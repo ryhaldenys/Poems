@@ -20,7 +20,13 @@ public class AuthenticationService {
     public AuthenticationResponseDto authenticate(AuthenticationRequestDto request){
         var author = getAuthorByEmail(request);
         authenticateUser(request);
-        String token = createToken(request,author);
+        String token = createToken(author);
+        return getResponse(author,token);
+    }
+
+    public AuthenticationResponseDto authenticate(Author author, String password){
+        authenticateUser(author.getEmail(),password);
+        String token = createToken(author);
         return getResponse(author,token);
     }
 
@@ -32,12 +38,16 @@ public class AuthenticationService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(),request.password()));
     }
 
-    private String createToken(AuthenticationRequestDto request, Author author) {
-        return tokenProvider.createToken(request.email(), author.getRole().name());
+    private void authenticateUser(String email, String password){
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
+    }
+
+    private String createToken(Author author) {
+        return tokenProvider.createToken(author.getEmail(), author.getRole().name());
     }
 
     private AuthenticationResponseDto getResponse(Author author, String token){
-        return new AuthenticationResponseDto(author.getId(), author.getEmail(),token);
+        return new AuthenticationResponseDto(author.getId(),token);
     }
 }
 

@@ -3,6 +3,7 @@ package ua.poems_club.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
@@ -18,29 +19,25 @@ import ua.poems_club.service.AuthorService;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final AuthorService authorService;
-    private final AuthorRepository authorRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto request){
+    @PostMapping(value = "/login",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public ResponseEntity<?> authenticate(AuthenticationRequestDto request){
         var response = authenticationService.authenticate(request);
+        return getEntityResponseWithOkStatus(response);
+    }
+
+    @PostMapping(value = "/register",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public ResponseEntity<?> register(RegistrationRequestDto request){
+
+        var createdAuthor = authorService.createAuthor(request);
+        var response = authenticationService.authenticate(createdAuthor, request.password());
+
+        return getEntityResponseWithOkStatus(response);
+    }
+
+
+    private <T> ResponseEntity<?> getEntityResponseWithOkStatus(T response){
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegistrationRequestDto request){
-        authorService.createAuthor(request);
-
-        var registeredUser = new AuthenticationRequestDto(request.email(), request.password());
-
-        var response = authenticationService.authenticate(registeredUser);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response){
-        var securityContextLogoutHandler = new SecurityContextLogoutHandler();
-        securityContextLogoutHandler.logout(request,response,null);
-    }
-
 }
 

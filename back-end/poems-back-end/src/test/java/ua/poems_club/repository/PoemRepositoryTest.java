@@ -37,19 +37,19 @@ public class PoemRepositoryTest {
     @Test
     void findAllPoemsTest(){
         var currentUser = authors.get(1);
-        var poemsDtos = mapToPoemsDto(currentUser);
+        var poemsDtos = mapPublicPoemsToPoemsDto(currentUser);
         var foundPoems = poemRepository.findAllPoems(currentUser.getId(),Pageable.unpaged());
 
         assertThat(foundPoems.getContent()).isEqualTo(poemsDtos);
     }
 
-    private List<PoemsDto> mapToPoemsDto(){
+    private List<PoemsDto> mapAllPoemsToPoemsDto(Author author){
         return poems.stream().map((p)-> new PoemsDto(p.getId(),p.getName(),p.getText(),p.getAuthor().getId(),
-                        p.getStatus(),p.getAuthor().getFullName(),(long) p.getLikes().size(),false))
+                        p.getStatus(),p.getAuthor().getFullName(),(long) p.getLikes().size(),p.getLikes().contains(author)))
                 .collect(Collectors.toList());
     }
 
-    private List<PoemsDto> mapToPoemsDto(Author author){
+    private List<PoemsDto> mapPublicPoemsToPoemsDto(Author author){
         return poems.stream()
                 .filter(p-> p.getStatus().equals(PUBLIC))
                 .map((p)-> new PoemsDto(p.getId(),p.getName(),p.getText(),p.getAuthor().getId(),
@@ -60,13 +60,13 @@ public class PoemRepositoryTest {
     @Test
     void findAllPoemsByNameTest(){
         var currentUser = authors.get(4);
-        var poemsDtos = mapToPoemsDto(currentUser);
+        var poemsDtos = mapPublicPoemsToPoemsDto(currentUser);
 
         var foundPoems = poemRepository.findAllPoemsByName(currentUser.getId(),Pageable.unpaged(),poemsDtos.get(2).getName())
                 .getContent();
         System.out.println(foundPoems);
 
-        assertThat(foundPoems.get(0)).isEqualTo(poemsDtos.get(0));
+        assertThat(foundPoems.get(0)).isEqualTo(poemsDtos.get(2));
     }
 
     @Test
@@ -95,8 +95,10 @@ public class PoemRepositoryTest {
         var currentUser = authors.get(0);
         var poems = poemRepository.findAllPoemsByAuthorId(author.getId(),currentUser.getId(),Pageable.unpaged())
                 .getContent();
-        var poemsDtos = mapToPoemsDto();
-        assertThat(poems.get(0)).isEqualTo(poemsDtos.get(0));
+        var poemsDtos = mapAllPoemsToPoemsDto(currentUser);
+        System.out.println(poems);
+        System.out.println(poemsDtos);
+        assertThat(poems.get(0)).isEqualTo(poemsDtos.get(1));
     }
 
     @Test
@@ -143,7 +145,7 @@ public class PoemRepositoryTest {
         var foundLikes = poemRepository.findAllAuthorLikes(currentUser.getId(),Pageable.unpaged())
                 .getContent();
 
-        assertThat(foundLikes).isEqualTo(mapToPoemsDto(currentUser));
+        assertThat(foundLikes).isEqualTo(mapPublicPoemsToPoemsDto(currentUser));
     }
 
 

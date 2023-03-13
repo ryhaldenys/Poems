@@ -49,6 +49,4 @@ public class CustomAuthorRepositoryImpl implements CustomAuthorRepository {
                 .getSingleResult();
     }
 
-
-
 }

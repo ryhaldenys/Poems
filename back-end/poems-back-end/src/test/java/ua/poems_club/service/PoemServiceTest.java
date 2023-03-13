@@ -35,20 +35,20 @@ public class PoemServiceTest {
 
     private List<Author> authors;
     private List<Poem> poems;
-    private List<PoemsDto> poemsDtos;
     private Author currentUser;
 
 
     @BeforeEach
     void setUp() {
         addDataToDB();
-        poemsDtos = mapToPoemsDto(currentUser,poems);
         currentUser = authors.get(0);
     }
 
     @Test
     void getAllPoems(){
         var foundPoems = poemService.getAllPoems(currentUser.getId(), Pageable.unpaged(),"").getContent();
+        List<PoemsDto> poemsDtos = mapToPoemsDto(currentUser, poems);
+
         assertThat(foundPoems).isEqualTo(poemsDtos);
     }
 
@@ -92,6 +92,7 @@ public class PoemServiceTest {
         authors.get(0).addSubscriber(authors.get(1));
         authors.get(0).addSubscriber(authors.get(2));
         authors.get(3).addSubscriber(authors.get(0));
+
     }
 
 }
