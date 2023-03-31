@@ -1,0 +1,142 @@
+* {
+  text-decoration: none;
+  padding: 0px;
+  margin: 0px;
+}
+
+* {
+  background-color: white;
+}
+
+.main-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-block {
+  height: 180px;
+  width: 450px;
+  padding: 10px;
+  margin-bottom: 100px;
+  border-radius: 10px;
+  box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px,
+    rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}
+
+h1 {
+  padding: 20px 20px;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.authorization {
+  padding: 10px;
+  display: flex;
+}
+
+.auth-block {
+  padding: 10px;
+}
+
+.register-block {
+  padding: 10px;
+}
+
+input {
+  height: 50px;
+  border: 1px solid black;
+  border-radius: 10px;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+}
+
+.auth-block input {
+  color: black;
+  width: 120px;
+  box-shadow: 0 2px #000000;
+}
+
+.register-block input {
+  background-color: black;
+  color: white;
+  width: 170px;
+  box-shadow: 0 2px #000000;
+}
+
+.auth-block input:hover {
+  box-shadow: 0px 2px #000000;
+}
+
+.auth-block input:active {
+  box-shadow: 0 1px #000000;
+  transform: translateY(4px);
+}
+
+.register-block input:hover {
+  box-shadow: 0px 2px 2px #000000;
+}
+
+.register-block input:active {
+  transform: translateY(4px);
+}
+
+@media (max-width: 500px) {
+  .content-block {
+    height: 150px;
+    width: 270px;
+    padding: 5px;
+  }
+
+  h1 {
+    padding: 5px 5px;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .authorization {
+    padding: 5px;
+    display: flex;
+  }
+
+  .auth-block {
+    padding-left: 0px;
+    padding-right: 5px;
+  }
+
+  .register-block {
+    padding-left: 5px;
+  }
+
+  input {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .auth-block input {
+    width: 95px;
+  }
+
+  .register-block input {
+    width: 135px;
+  }
+}
+
+/*    <main class="main-container">
+      <div class="content-block">
+        <h1>Вітаємо в Poems club</h1>
+        <div class="authorization">
+          <div class="auth-block">
+            <a href="auth.html">Увійти</a>
+          </div>
+          <div class="register-block">
+            <a href="registration.html">Зареєструватися</a>
+          </div>
+        </div>
+      </div>
+    </main>
+    */

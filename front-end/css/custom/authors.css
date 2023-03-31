@@ -1,35 +1,102 @@
-.t454__maincontainer {
-}
-.t454__c12collumns {
+* {
+  text-decoration: none;
 }
 
 .main-container {
+  max-width: 1200px;
+  margin: 0px auto;
+  padding-top: 100px;
+  padding-bottom: 50px;
 }
 
-.main-content {
-  padding: 10px 20px;
-  padding-bottom: 70px;
+.find-container {
+  padding: 20px 0px;
+  padding-right: 10px;
+}
+
+.title-block {
+  padding-top: 30px;
+  padding-bottom: 20px;
+}
+
+.title-text {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.find-block {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+.type {
+  margin-right: 5px;
+  border-radius: 10px;
+  height: 40px;
+  width: 200px;
+  border: 1px solid black;
+  font-size: 16px;
+}
+
+.type[placeholder] {
+  padding-left: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.find {
+  border: 1px solid black;
+  border-radius: 10px;
+  height: 40px;
+  width: 120px;
+  background-color: black;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 440px) {
+  .main-container {
+    padding-bottom: 100px;
+  }
+
+  .find-block {
+    justify-content: center;
+  }
+
+  .type {
+    font-size: 15px;
+    width: 170px;
+  }
+
+  .type[placeholder] {
+    padding-left: 10px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .find {
+    font-size: 14px;
+    width: 110px;
+  }
 }
 
 .main-user-block {
   display: flex;
   align-items: center;
-  padding: 20px 0px;
-  padding-top: 60px;
+  justify-content: start;
+  padding: 20px 10px;
+  padding-top: 40px;
   border-bottom: 1.5px solid rgb(148, 148, 148);
 }
 
 .user-image {
   margin: 0px 20px;
-  border-radius: 90px;
-  flex: 0 0 200px;
+  border-radius: 50%;
   height: 200px;
+  flex: 0 0 200px;
   overflow: hidden;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 0;
 }
 
 .user-image img {
@@ -38,28 +105,9 @@
   object-fit: cover;
 }
 
-.user-poems {
-  position: absolute;
-  font-size: 17px;
-  font-weight: 700;
-  color: white;
-  text-decoration: underline;
-  display: none;
-  z-index: 1;
-}
-
 .user-content {
   display: flex;
   flex-direction: column;
-}
-.user-image:hover::after {
-  content: "";
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.7);
 }
 
 .user-poems {
@@ -96,7 +144,6 @@
   width: 24px;
 }
 
-.user-likes,
 .user-subscribers {
   padding: 20px 0px;
   display: flex;
@@ -104,10 +151,11 @@
 }
 
 .user-subscribers {
-  padding: 20px 20px;
+  display: flex;
+  align-items: center;
 }
 
-.subscribe input {
+.sub {
   width: 100px;
   height: 35px;
   display: flex;
@@ -115,14 +163,16 @@
   justify-content: center;
   background-color: black;
   border: none;
+  cursor: pointer;
   color: white;
   border-radius: 10px;
+  margin-left: 20px;
 }
 
-.user-likes p,
 .user-subscribers p {
+  width: 10px;
+  padding-right: 7px;
   font-size: 16px;
-  padding-left: 5px;
   font-weight: 400;
 }
 
@@ -159,20 +209,15 @@
     letter-spacing: 0.7px;
     font-size: 15px;
   }
-  .user-likes {
-    padding: 14px 0px;
-  }
 }
 
 @media (max-width: 690px) {
-  .user-image {
-    margin: 0px 15px;
-    flex: 0 0 140px;
-    height: 140px;
+  .title-text {
+    font-size: 35px;
   }
 
   .main-user-block {
-    justify-content: center;
+    justify-content: start;
     padding-top: 40px;
   }
   .user-title {
@@ -185,10 +230,6 @@
     letter-spacing: 0.7px;
     font-size: 14px;
   }
-  .user-likes p {
-    font-size: 15px;
-    padding: 14px 0px;
-  }
 }
 
 @media (max-width: 550px) {
@@ -198,6 +239,10 @@
     width: 210px;
   }
 
+  .title-text {
+    font-size: 30px;
+  }
+
   .main-user-block {
     justify-content: center;
     align-items: center;
@@ -205,6 +250,7 @@
     padding-top: 40px;
   }
   .user-title {
+    text-align: center;
     padding-top: 20px;
     padding-bottom: 15px;
     font-size: 23px;
@@ -212,12 +258,17 @@
     font-weight: 450;
   }
   .user-description {
+    text-align: justify;
     letter-spacing: 0.7px;
     font-size: 15px;
   }
   .user-likes p {
     font-size: 16px;
     padding: 14px 0px;
+  }
+  .user-details {
+    align-items: center;
+    justify-content: center;
   }
 }
 

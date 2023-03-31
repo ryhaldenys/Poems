@@ -1,15 +1,428 @@
-.tn-elem__5459095221675427732054 {
-  margin-left: 5px;
+* {
+  padding: 0px;
+  margin: 0px;
+  text-decoration: none;
 }
 
-@media (max-width: 960px) {
-  .tn-elem__5459095221675427732054 {
-    margin-left: 0px;
+input[type="text"],
+input[type="password"] {
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  outline: 0;
+  padding: 0;
+}
+
+.main-container {
+  padding-top: 70px;
+  max-width: 1200px;
+  margin: 0px auto;
+}
+
+.main-block {
+  padding: 10px 20px;
+  padding-top: 50px;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.refactor-block-one {
+  padding: 5px;
+  padding-right: 10px;
+}
+
+.change-image-title {
+  font-size: 27px;
+  font-weight: 500;
+  padding-bottom: 20px;
+}
+
+.change-image-buttons {
+  display: flex;
+}
+
+.image {
+  border-radius: 50%;
+  flex: 0 0 170px;
+  height: 170px;
+  overflow: hidden;
+  position: relative;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.change {
+  padding-left: 30px;
+}
+
+.change div {
+  font-size: 18px;
+  padding: 2.5px 0px;
+  cursor: pointer;
+}
+
+.change label {
+  cursor: pointer;
+}
+input[type="file"] {
+  display: none;
+}
+
+.logout-button {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.logout {
+  border: 1px solid black;
+  height: 40px;
+  width: 110px;
+  border-radius: 10px;
+  color: white;
+  background-color: black;
+  font-size: 15px;
+}
+
+.change-password-block {
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+
+.error-block {
+  padding-bottom: 5px;
+}
+
+.change-password-title {
+  font-size: 27px;
+  font-weight: 500;
+  padding-bottom: 20px;
+}
+
+.change-password {
+  display: flex;
+  align-items: self-end;
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+
+.old-password,
+.new-password {
+  padding: 15px 5px;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.old-password label,
+.new-password label {
+  padding-bottom: 10px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.error-block {
+  font-size: 14px;
+  color: red;
+  padding-left: 5px;
+  padding-bottom: 20px;
+}
+
+input[type="text"],
+input[type="password"] {
+  height: 30px;
+  width: 140px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+
+input[placeholder] {
+  padding: 5px;
+  font-size: 16px;
+}
+
+.change-password-button {
+  padding: 15px 5px;
+}
+.change-password-btn {
+  border: 1px solid black;
+  height: 41px;
+  width: 100px;
+  border-radius: 10px;
+  color: white;
+  background-color: black;
+  font-size: 15px;
+}
+
+.remove-account {
+  padding: 20px 0px;
+}
+
+.remove {
+  border: 1px solid black;
+  height: 45px;
+  width: 145px;
+  border-radius: 10px;
+  color: white;
+  background-color: black;
+  font-size: 15px;
+}
+
+.refactor-block-two {
+  padding: 5px;
+  padding-left: 10px;
+}
+
+.refactor-block-two .error-block {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.refactor-title {
+  padding-top: 1;
+  font-size: 27px;
+  font-weight: 500px;
+  padding-bottom: 20px;
+}
+
+.refactor-form {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+
+.full-name-block,
+.email-block,
+.description-block {
+  padding: 15px 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-name-block label,
+.email-block label,
+.description-block label {
+  padding-bottom: 10px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.full-name-block input,
+.email-block input,
+.description-block textarea {
+  width: 500px;
+}
+
+.description-block textarea {
+  height: 180px;
+  font-size: 16px;
+  resize: none;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+textarea[placeholder] {
+  padding: 5px;
+}
+
+.update-button {
+  padding-top: 16px;
+}
+
+.update {
+  border: 1px solid black;
+  height: 45px;
+  width: 145px;
+  border-radius: 10px;
+  color: white;
+  background-color: black;
+  font-size: 15px;
+}
+
+@media (max-width: 1005px) {
+  .main-block {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .refactor-block-one {
+    width: 500px;
+    padding: 5px;
   }
 }
 
-@media (max-width: 480px) {
-  .tn-elem__5459095221675427732054 {
-    margin-left: 0px;
+@media (max-width: 535px) {
+  .main-block {
+    align-items: start;
+  }
+  .refactor-block-one {
+    width: 100%;
+    padding: 5px;
+  }
+  .change-image-title {
+    font-size: 22px;
+    padding-bottom: 15px;
+  }
+
+  .image {
+    flex: 0 0 150px;
+    height: 150px;
+  }
+
+  .change {
+    padding-left: 25px;
+  }
+
+  .change div {
+    font-size: 16px;
+    padding: 5px 0px;
+  }
+
+  .add-image {
+    padding-bottom: 10px;
+  }
+  .logout-button {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .change-password-block {
+    padding-top: 10px;
+    padding-bottom: 5px;
+  }
+
+  .error-block {
+    padding-bottom: 15px;
+  }
+
+  .change-password-title {
+    font-size: 22px;
+
+    padding-bottom: 15px;
+  }
+
+  .change-password {
+    padding-bottom: 15px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    height: 30px;
+    width: 120px;
+    font-size: 15px;
+  }
+
+  input[placeholder] {
+    padding: 5px;
+    font-size: 15px;
+  }
+
+  .remove-account {
+    padding: 15px 0px;
+  }
+
+  .remove {
+    border: 1px solid black;
+    height: 45px;
+    width: 145px;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
+    font-size: 15px;
+  }
+
+  .refactor-block-two {
+    padding: 5px;
+    width: 100%;
+  }
+
+  .refactor-title {
+    padding-top: 10px;
+    font-size: 22px;
+    padding-bottom: 15px;
+  }
+
+  .refactor-form {
+    padding-top: 10px;
+    padding-bottom: 15px;
+  }
+
+  .full-name-block input,
+  .email-block input,
+  .description-block textarea {
+    width: auto;
+  }
+
+  .description-block textarea {
+    height: 160px;
+    font-size: 15px;
+  }
+
+  textarea[placeholder] {
+    padding: 5px;
+  }
+
+  .update-button {
+    padding-top: 14px;
+  }
+}
+
+@media (max-width: 443px) {
+  .margin-block {
+    padding-left: 50px;
+    padding-right: 20px;
+  }
+  .refactor-block-one {
+    width: 100%;
+    padding: 5px 0px;
+  }
+
+  .change {
+    padding-left: 15px;
+  }
+  .change-password {
+    padding-bottom: 15px;
+    display: contents;
+    width: 100%;
+  }
+
+  .old-password,
+  .new-password {
+    padding-left: 0px;
+    padding-right: 5px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    height: 30px;
+    width: auto;
+    font-size: 15px;
+  }
+
+  input[placeholder] {
+    padding: 5px;
+    font-size: 15px;
+  }
+
+  .remove-account {
+    padding: 15px 0px;
+    padding-top: 25px;
+  }
+
+  .remove {
+    border: 1px solid black;
+    height: 45px;
+    width: 145px;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
+    font-size: 15px;
+  }
+  .refactor-block-two {
+    padding: 5px 0px;
   }
 }

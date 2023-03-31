@@ -1,3 +1,8 @@
+main {
+  max-width: 1200px;
+  margin: 0px auto;
+}
+
 .poems {
   padding-bottom: 50px;
 }
@@ -16,6 +21,17 @@
 .poem-description {
   padding-left: 20px;
   padding-right: 10px;
+}
+
+.title-block {
+  padding-top: 110px;
+  padding-bottom: 30px;
+}
+
+.title-text {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 600;
 }
 
 .poem-title {
@@ -79,9 +95,6 @@
   margin: 5px;
 }
 
-@media (max-width: 1000px) {
-}
-
 @media (max-width: 850px) {
   .poem-title {
     font-size: 23px;
@@ -107,6 +120,11 @@
     flex-direction: column;
     align-items: self-start;
   }
+
+  .title-text {
+    font-size: 35px;
+  }
+
   .poem-title {
     font-size: 23px;
     font-weight: 500;
@@ -182,45 +200,6 @@
   }
 }
 
-@media (max-width: 620px) {
-  .poem {
-    flex-direction: column;
-    align-items: self-start;
-  }
-  .poem-title {
-    font-size: 23px;
-    font-weight: 500;
-  }
-
-  .poem-description {
-    padding: 10px;
-  }
-  .poem-buttons {
-    flex-direction: row;
-    justify-content: space-around;
-    padding: 5px;
-  }
-
-  .poem-containing {
-    padding-bottom: 10px;
-  }
-  .likes {
-    padding-top: 14px;
-  }
-  .poem-buttons input {
-    width: 108px;
-    height: 38px;
-    margin: 2px;
-  }
-
-  .text {
-    font-size: 15px;
-  }
-  .likes {
-    padding-top: 17px;
-  }
-}
-
 @media (max-width: 423px) {
   .poem-buttons {
     width: 100%;
@@ -229,6 +208,9 @@
     display: block;
   }
 
+  .title-text {
+    font-size: 30px;
+  }
   .poem-description {
     padding: 10px 2px;
   }

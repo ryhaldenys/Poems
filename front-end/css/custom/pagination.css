@@ -1,0 +1,36 @@
+.pagination-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 60px;
+}
+
+/*--------------------*/
+.pagination {
+  display: inline-block;
+}
+
+.pagination a,
+.pagination div {
+  margin: 1px;
+  font-weight: 500;
+  font-size: 17px;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  float: left;
+  height: 40px;
+  width: 48px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  border: 1.2px solid #b6b6b6;
+}
+
+.pagination div {
+  cursor: default;
+}
+
+.pagination a:hover {
+  background-color: #c1c1c1;
+}

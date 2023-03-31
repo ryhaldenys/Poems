@@ -941,3 +941,62 @@ img:not([src]) {
     font-size: 17px;
   }
 }
+
+.find-container {
+  padding-right: 10px;
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+
+.find-block {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+.type {
+  margin-right: 5px;
+  border-radius: 10px;
+  height: 40px;
+  width: 200px;
+  border: 1px solid black;
+  font-size: 16px;
+}
+
+.type[placeholder] {
+  padding-left: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.find {
+  border: 1px solid black;
+  border-radius: 10px;
+  height: 40px;
+  width: 120px;
+  background-color: black;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 440px) {
+  .find-block {
+    justify-content: center;
+  }
+
+  .type {
+    font-size: 15px;
+    width: 170px;
+  }
+
+  .type[placeholder] {
+    padding-left: 10px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .find {
+    font-size: 14px;
+    width: 110px;
+  }
+}

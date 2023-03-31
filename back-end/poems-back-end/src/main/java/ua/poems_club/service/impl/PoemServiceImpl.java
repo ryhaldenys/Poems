@@ -41,7 +41,7 @@ public class PoemServiceImpl implements PoemService {
     }
 
     private Page<PoemsDto> getAllByName(Long currentUserId, Pageable pageable, String name) {
-        var poems = poemRepository.findAllPoemsByName(currentUserId,pageable, name);
+        var poems = poemRepository.findAllPoemsWhichContainText(currentUserId,pageable, name);
         checkIsPoems(poems.getContent());
         return poems;
     }

@@ -30,6 +30,11 @@
   cursor: pointer;
 }
 
+.author a {
+  text-decoration: none;
+  color: white;
+}
+
 .likes p {
   padding-left: 5px;
   font-size: 16px;
@@ -132,9 +137,13 @@
   }
 }
 
-@media (max-width: 370px) {
+.data-loading {
+  padding: 250px 0px;
+}
+
+@media (max-width: 400px) {
   .author-name {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .t-text {
