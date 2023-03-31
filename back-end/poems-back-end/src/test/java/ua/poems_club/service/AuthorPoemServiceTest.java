@@ -47,7 +47,8 @@ public class AuthorPoemServiceTest {
     @Test
     void getAllPublicPoemsByAuthorIdTest(){
         var author = authors.get(0);
-        var foundPoems = authorPoemService.getAllPublicPoemsByAuthorId(author.getId(), currentUser.getId(), Pageable.unpaged()).getContent();
+        var poemName = author.getPoems().get(0).getName();
+        var foundPoems = authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(author.getId(), currentUser.getId(),poemName, Pageable.unpaged()).getContent();
 
         assertThat(foundPoems.get(0).getId()).isEqualTo(author.getPoems().get(0).getId());
         assertThat(foundPoems.get(0).getAmountLikes()).isEqualTo(1L);
@@ -57,7 +58,7 @@ public class AuthorPoemServiceTest {
     @Test
     void getAllPublicPoemsByWrongAuthorIdTest(){
 
-        assertThatThrownBy(()->authorPoemService.getAllPublicPoemsByAuthorId(1000L, currentUser.getId(), Pageable.unpaged()))
+        assertThatThrownBy(()->authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(1000L, currentUser.getId(), " ",Pageable.unpaged()))
                 .isInstanceOf(NotFoundException.class);
     }
 

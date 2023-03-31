@@ -21,8 +21,9 @@ public class AuthorPoemsController {
     private final AuthorPoemService authorPoemService;
 
     @GetMapping
-    public Page<PoemsDto> getAllPoemsOfAuthor(@PathVariable Long id, Pageable pageable,@AuthenticationPrincipal SecurityUser currentUser){
-        return authorPoemService.getAllPublicPoemsByAuthorId(id,currentUser.getId(),pageable);
+    public Page<PoemsDto> getAllPoemsOfAuthor(@PathVariable Long id, Pageable pageable,@AuthenticationPrincipal SecurityUser currentUser,
+                                              @RequestParam(defaultValue = "",name = "poemName")String poemName){
+        return authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(id,currentUser.getId(),poemName,pageable);
     }
 
     @GetMapping("/own")
@@ -38,7 +39,7 @@ public class AuthorPoemsController {
         authorPoemService.createPoem(id,poem);
     }
 
-    @PutMapping("/{poem_id}")
+    @PutMapping(value = "/{poem_id}")
     @PreAuthorize("authentication.principal.id == #id")
     @ResponseStatus(NO_CONTENT)
     public void updatePoem(@PathVariable Long id, @PathVariable("poem_id") Long poemId,@RequestBody RequestPoemDto poem){

@@ -29,7 +29,8 @@ import ua.poems_club.model.Author;
 import ua.poems_club.security.model.JwtTokenProvider;
 import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.security.service.AuthenticationService;
-import ua.poems_club.service.AuthorService;
+import ua.poems_club.service.GettingDataAuthorService;
+import ua.poems_club.service.ManipulationAuthorService;
 
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +55,10 @@ public class AuthorControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private AuthorService service;
+    private GettingDataAuthorService service;
+
+    @MockBean
+    private ManipulationAuthorService manipulationAuthorService;
 
     @MockBean
     private AuthenticationService authenticationService;
@@ -77,7 +81,7 @@ public class AuthorControllerTest {
         var authorsDtos = mapToAuthorsDto(authors);
         Page<AuthorsDto> page = new PageImpl<>(authorsDtos);
 
-        when(service.getAllAuthors(anyLong(),any(Pageable.class)))
+        when(service.getAllAuthors(anyLong(),anyString(),any(Pageable.class)))
                 .thenReturn(page);
 
         mockMvc.perform(get("/api/authors")
@@ -93,7 +97,7 @@ public class AuthorControllerTest {
     @SneakyThrows
     @Test
     void getEmptyPageOfAuthorsTest(){
-        when(service.getAllAuthors(anyLong(),any(Pageable.class)))
+        when(service.getAllAuthors(anyLong(),anyString(),any(Pageable.class)))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/authors")
@@ -157,9 +161,9 @@ public class AuthorControllerTest {
     @SneakyThrows
     void updateAuthorWithFullNameWhichAlreadyExist(){
         var author = authors.get(2);
-        var authorDto = new UpdateAuthorDto(author.getFullName(), author.getEmail(), author.getDescription(),author.getPassword());
+        var authorDto = new UpdateAuthorDto(author.getFullName(), author.getEmail(), author.getDescription());
 
-        BDDMockito.willThrow(AuthorAlreadyExist.class).given(service).updateAuthor(author.getId(),authorDto);
+        BDDMockito.willThrow(AuthorAlreadyExist.class).given(manipulationAuthorService).updateAuthor(author.getId(),authorDto);
 
         mockMvc.perform(put("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
@@ -199,7 +203,7 @@ public class AuthorControllerTest {
         var password = new PasswordDto("old","new");
 
         BDDMockito.willThrow(IncorrectAuthorDetailsException.class)
-                .given(service).updateAuthorPassword(author.getId(),password);
+                .given(manipulationAuthorService).updateAuthorPassword(author.getId(),password);
 
         mockMvc.perform(patch("/api/authors/"+author.getId()+"/password")
                         .contentType(APPLICATION_JSON)
@@ -243,10 +247,10 @@ public class AuthorControllerTest {
     void deleteAuthorTest(){
         var author = authors.get(0);
 
-        when(service.deleteAuthor(author.getId()))
+        when(manipulationAuthorService.deleteAuthor(author.getId()))
                 .thenReturn(author);
 
-        when(service.deleteAuthor(1L)).thenReturn(author);
+        when(manipulationAuthorService.deleteAuthor(1L)).thenReturn(author);
 
         mockMvc.perform(delete("/api/authors/1")
                         .with(csrf()))
@@ -262,7 +266,7 @@ public class AuthorControllerTest {
     void getSubscriptionsTest(){
         var subscriptions = mapToAuthorsDto(List.of(authors.get(0)));
 
-        when(service.getAuthorSubscriptions(anyLong(),any(Pageable.class)))
+        when(service.getAuthorSubscriptions(anyLong(),anyString(),any(Pageable.class)))
                 .thenReturn(new PageImpl<>(subscriptions));
 
         mockMvc.perform(get("/api/authors/1/subscriptions")
@@ -277,7 +281,7 @@ public class AuthorControllerTest {
     @SneakyThrows
     void getSubscriptionsWhenTheyAreNotExistTest(){
 
-        when(service.getAuthorSubscriptions(anyLong(),any(Pageable.class)))
+        when(service.getAuthorSubscriptions(anyLong(),anyString(),any(Pageable.class)))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/authors/1/subscriptions")
@@ -294,7 +298,7 @@ public class AuthorControllerTest {
     void getSubscribersTest(){
         var subscriptions = mapToAuthorsDto(List.of(authors.get(0)));
 
-        when(service.getAuthorSubscribers(anyLong(),any(Pageable.class)))
+        when(service.getAuthorSubscribers(anyLong(),anyString(),any(Pageable.class)))
                 .thenReturn(new PageImpl<>(subscriptions));
 
         mockMvc.perform(get("/api/authors/1/subscribers")
@@ -308,7 +312,7 @@ public class AuthorControllerTest {
     @Test
     @SneakyThrows
     void getSubscribersWhenTheyAreNotExistDbTest(){
-        when(service.getAuthorSubscribers(anyLong(),any(Pageable.class)))
+        when(service.getAuthorSubscribers(anyLong(),anyString(),any(Pageable.class)))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/authors/1/subscribers")
@@ -326,7 +330,7 @@ public class AuthorControllerTest {
         var likes = List.of(new PoemsDto(1L,"name","text",
                 1L, PUBLIC,"author",2L,1L));
 
-        when(service.getAuthorLikes(anyLong(),any(Pageable.class)))
+        when(service.getAuthorLikes(anyLong(),anyString(),any(Pageable.class)))
                 .thenReturn(new PageImpl<>(likes));
 
         mockMvc.perform(get("/api/authors/1/likes")
@@ -341,7 +345,7 @@ public class AuthorControllerTest {
     @SneakyThrows
     void getLikesWhenTheyAreNotExistTest(){
 
-        when(service.getAuthorLikes(anyLong(),any(Pageable.class)))
+        when(service.getAuthorLikes(anyLong(),anyString(),any(Pageable.class)))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/authors/1/likes")

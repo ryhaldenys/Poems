@@ -2,16 +2,14 @@ package ua.poems_club.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ua.poems_club.builder.AuthorBuilder;
-import ua.poems_club.dto.author.*;
-import ua.poems_club.dto.poem.PoemsDto;
+import ua.poems_club.dto.author.PasswordDto;
+import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.InvalidImagePathException;
@@ -19,80 +17,27 @@ import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
-import ua.poems_club.repository.PoemRepository;
-import ua.poems_club.security.dto.AuthenticationResponseDto;
 import ua.poems_club.security.dto.RegistrationRequestDto;
-import ua.poems_club.security.service.AuthenticationService;
-import ua.poems_club.service.AuthorService;
+import ua.poems_club.service.ManipulationAuthorService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuthorServiceImpl implements AuthorService {
+public class ManipulationAuthorServiceImpl implements ManipulationAuthorService {
     private final AuthorRepository authorRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    @Value("${file.path}")
-    private String imagePath;
-
     @Value("${default.image}")
     private String defaultImage;
-    private final PoemRepository poemRepository;
-
-
-    @Override
-    public Page<AuthorsDto> getAllAuthors(Long currentAuthorId,Pageable pageable) {
-        var authors = getAll(currentAuthorId,pageable);
-        setImagePathForAll(authors);
-        return authors;
-    }
-
-    private Page<AuthorsDto> getAll(Long currentAuthorId, Pageable pageable){
-        var authors = authorRepository.findAllAuthors(currentAuthorId,pageable);
-        checkAreAuthors(authors);
-        return authors;
-    }
-
-    private void setImagePathForAll(Page<AuthorsDto> authors) {
-        authors.forEach(this::setImagePath);
-    }
-
-    private void setImagePath(AuthorsDto author){
-        if (author.getImagePath() == null)
-            author.setImagePath(imagePath+uploadPath+"/"+defaultImage);
-        else
-            author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
-    }
-
-
-
-    @Override
-    public AuthorDto getAuthorById(Long id) {
-        var author = getById(id);
-        setImagePath(author);
-        return author;
-    }
-
-    private AuthorDto getById(Long id){
-        return authorRepository.findAuthorById(id).
-                orElseThrow(()->throwNotFoundAuthorById(id));
-    }
-
-    private void setImagePath(AuthorDto author) {
-        if (author.getImagePath() == null)
-            author.setImagePath(imagePath+uploadPath+"/"+defaultImage);
-        else
-            author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
-    }
 
 
     @Override
@@ -113,7 +58,7 @@ public class AuthorServiceImpl implements AuthorService {
         return AuthorBuilder.builder()
                 .fullName(authorDto.fullName())
                 .email(authorDto.email())
-                .imageUrl("default")
+                .imageUrl(defaultImage)
                 .password(authorDto.password())
                 .build();
     }
@@ -174,7 +119,6 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
 
-
     @Override
     @Transactional
     public void updateAuthorPassword(Long id, PasswordDto password) {
@@ -198,7 +142,6 @@ public class AuthorServiceImpl implements AuthorService {
     private NotFoundException throwNotFoundAuthorById(Long id){
         return new NotFoundException("Cannot find an author by id: "+id);
     }
-
 
     @Override
     @Transactional
@@ -246,17 +189,6 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.deleteById(id);
     }
 
-
-    @Override
-    public Author getAuthorByEmail(String email) {
-        return getByEmail(email);
-    }
-
-    private Author getByEmail(String email){
-        return authorRepository.findByEmail(email)
-                .orElseThrow(()-> new NotFoundException("Cannot find author by email: "+email));
-    }
-
     @Override
     @Transactional
     public void addAuthorImage(Long id, MultipartFile imageUrl) {
@@ -282,7 +214,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     private void deleteOldImageIfItExist(Author author) throws IOException {
         var imageName = author.getImageName();
-        if (!Objects.isNull(imageName)){
+        if (!imageName.equals(defaultImage)){
             FileSystemUtils.deleteRecursively(Path.of(uploadPath+"/"+imageName));
         }
     }
@@ -352,9 +284,6 @@ public class AuthorServiceImpl implements AuthorService {
         author.addSubscription(subscription);
     }
 
-
-
-
     @Override
     @Transactional
     public void deleteImage(Long id) {
@@ -365,59 +294,14 @@ public class AuthorServiceImpl implements AuthorService {
         try {
             var author = getAuthor(id);
             deleteOldImageIfItExist(author);
-            setNullImageName(author);
+            setDefaultImageName(author);
         } catch (IOException e) {
             throw new InvalidImagePathException("Invalid image path");
         }
     }
 
-    private void setNullImageName(Author author){
-        author.setImageName(null);
+    private void setDefaultImageName(Author author){
+        author.setImageName(defaultImage);
     }
 
-
-    @Override
-    public Page<AuthorsDto> getAuthorSubscriptions(Long id,Pageable pageable) {
-        return getSubscriptions(id,pageable);
-    }
-
-    private Page<AuthorsDto> getSubscriptions(Long id,Pageable pageable){
-        var subscriptions = authorRepository.findAllSubscriptions(id,pageable);
-        checkAreAuthors(subscriptions);
-        return subscriptions;
-    }
-
-    @Override
-    public Page<AuthorsDto> getAuthorSubscribers(Long id,Pageable pageable) {
-        return getSubscribers(id,pageable);
-    }
-
-    private Page<AuthorsDto> getSubscribers(Long id,Pageable pageable){
-        var subscriptions = authorRepository.findAllSubscribers(id,pageable);
-        checkAreAuthors(subscriptions);
-        return subscriptions;
-    }
-
-    private void checkAreAuthors(Page<AuthorsDto> authors) {
-        if(authors.getContent().isEmpty()){
-            throw new NotFoundException("Cannot find any authors");
-        }
-    }
-
-    @Override
-    public Page<PoemsDto> getAuthorLikes(Long id,Pageable pageable) {
-        return getLikes(id,pageable);
-    }
-
-    private Page<PoemsDto> getLikes(Long id,Pageable pageable){
-        var likes = poemRepository.findAllAuthorLikes(id,pageable);
-        checkArePoems(likes);
-        return likes;
-    }
-
-    private void checkArePoems(Page<PoemsDto> poems){
-        if(poems.getContent().isEmpty()){
-            throw new NotFoundException("Cannot find any poems");
-        }
-    }
 }

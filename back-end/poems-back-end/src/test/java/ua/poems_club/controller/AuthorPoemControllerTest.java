@@ -70,7 +70,7 @@ public class AuthorPoemControllerTest {
     @Test
     @SneakyThrows
     void getAllPoemsOfAuthorTest(){
-        when(service.getAllPublicPoemsByAuthorId(anyLong(), anyLong(),any(Pageable.class)))
+        when(service.getAllPublicPoemsByAuthorIdAndContainText(anyLong(), anyLong(),anyString(),any(Pageable.class)))
                 .thenReturn(new PageImpl<>(mapToPoemsDto(poems)));
 
         mockMvc.perform(get("/api/authors/1/poems")
@@ -85,7 +85,7 @@ public class AuthorPoemControllerTest {
     @Test
     @SneakyThrows
     void getEmptyPagePoemsOfAuthorTest(){
-        when(service.getAllPublicPoemsByAuthorId(anyLong(), anyLong(),any(Pageable.class)))
+        when(service.getAllPublicPoemsByAuthorIdAndContainText(anyLong(), anyLong(),anyString(),any(Pageable.class)))
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/api/authors/1/poems")

@@ -8,13 +8,13 @@ import ua.poems_club.model.Author;
 import ua.poems_club.security.dto.AuthenticationRequestDto;
 import ua.poems_club.security.dto.AuthenticationResponseDto;
 import ua.poems_club.security.model.JwtTokenProvider;
-import ua.poems_club.service.AuthorService;
+import ua.poems_club.service.GettingDataAuthorService;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
-    private final AuthorService service;
+    private final GettingDataAuthorService service;
     private final JwtTokenProvider tokenProvider;
 
     public AuthenticationResponseDto authenticate(AuthenticationRequestDto request){
@@ -42,7 +42,7 @@ public class AuthenticationService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
     }
 
-    private String createToken(Author author) {
+    public String createToken(Author author) {
         return tokenProvider.createToken(author.getEmail(), author.getRole().name());
     }
 
