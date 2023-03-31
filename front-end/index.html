@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome</title>
+    <link rel="stylesheet" href="css/custom/index.css" />
+    <link rel="stylesheet" href="css/font.css" />
+  </head>
+  <body style="background-color: #eee">
+    <main class="main-container">
+      <div class="content-block">
+        <h1>Вітаємо в Poems club</h1>
+        <div class="authorization">
+          <div class="auth-block">
+            <input
+              type="submit"
+              onclick="window.location='auth.html';"
+              value="Увійти"
+            />
+          </div>
+          <div class="register-block">
+            <input
+              type="submit"
+              onclick="window.location='registration.html';"
+              value="Зареєструватися"
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      console.log(localStorage.getItem("token"));
+      if (localStorage.getItem("token") != null) {
+        window.location = "main.html";
+      }
+    </script>
+  </body>
+</html>

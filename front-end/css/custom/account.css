@@ -1,0 +1,394 @@
+* {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+* {
+  text-decoration: none;
+}
+
+.data-loading {
+  padding: 230px 0px;
+}
+
+.main-container {
+  max-width: 1200px;
+  margin: 0px auto;
+  padding: 0px 10px;
+  padding-top: 60px;
+}
+
+.all-content-block {
+  padding: 60px 20px;
+  padding-bottom: 80px;
+}
+
+.content-block {
+  padding: 30px 0px;
+}
+
+.general-data-block {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+.img-block {
+  border-radius: 50%;
+  height: 200px;
+  flex: 0 0 200px;
+  overflow: hidden;
+  margin-right: 20px;
+}
+
+.img-block img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-block a {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: black;
+}
+
+.content-block span {
+  padding-left: 5px;
+}
+
+.subscribers {
+  padding-left: 30px;
+}
+
+.sub-block {
+  display: flex;
+  padding-bottom: 10px;
+}
+
+.subscribers a:hover,
+.subscriptions a:hover,
+.poems a:hover {
+  color: rgb(61, 61, 61);
+}
+
+.likes {
+  padding-top: 8px;
+  padding-bottom: 5px;
+}
+
+.likes a {
+  display: flex;
+  align-items: center;
+}
+
+.likes img {
+  padding-right: 5px;
+}
+
+.add-poem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+  border-radius: 10px;
+  height: 55px;
+  width: 160px;
+  color: white;
+  margin: 20px 0px;
+  background-color: black;
+}
+
+.add-poem a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.own-data-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.own-data-block div:not(:last-child) {
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.name {
+  padding-bottom: 10px;
+}
+.email {
+  padding-bottom: 20px;
+}
+
+.description {
+  padding: 20px 0px;
+  font-size: 17px;
+}
+
+.refactor-block {
+  padding-left: 20px;
+  padding-right: 20px;
+
+  padding-bottom: 80px;
+}
+
+.refactor-block a {
+  font-size: 24px;
+  line-height: 1.3;
+  color: black;
+}
+
+.refactor-block a:hover {
+  color: rgb(61, 61, 61);
+}
+
+@media (max-width: 980px) {
+  .all-content-block {
+    padding: 60px 10px;
+    padding-bottom: 80px;
+  }
+
+  .refactor-block {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media (max-width: 610px) {
+  .main-container {
+    padding-top: 40px;
+  }
+  .all-content-block {
+    padding: 60px 10px;
+    padding-bottom: 70px;
+  }
+
+  .img-block {
+    height: 180px;
+    flex: 0 0 180px;
+    margin-right: 10px;
+  }
+
+  .content-block a {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .subscribers {
+    padding-left: 15px;
+  }
+
+  .add-poem {
+    height: 45px;
+    width: 140px;
+    margin: 15px 0px;
+  }
+
+  .add-poem a {
+    font-size: 15px;
+  }
+
+  .own-data-block div:not(:last-child) {
+    font-size: 22px;
+  }
+
+  .email {
+    padding-bottom: 18px;
+  }
+
+  .description {
+    padding: 18px 0px;
+    font-size: 16px;
+  }
+
+  .refactor-block a {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 610px) {
+  .img-block {
+    height: 170px;
+    flex: 0 0 170px;
+    margin-right: 20px;
+  }
+
+  .all-content-block {
+    padding: 60px 10px;
+  }
+
+  .content-block a {
+    font-size: 18px;
+  }
+
+  .sub-block {
+    flex-direction: column;
+  }
+  .subscribers {
+    padding-left: 0px;
+    padding-top: 10px;
+  }
+
+  .add-poem {
+    height: 40px;
+    width: 120px;
+  }
+
+  .add-poem a {
+    font-size: 14px;
+  }
+
+  .own-data-block div:not(:last-child) {
+    font-size: 20px;
+  }
+
+  .email {
+    padding-bottom: 16px;
+  }
+
+  .description {
+    padding: 16px 0px;
+    font-size: 16px;
+  }
+  .refactor-block a {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 610px) {
+  .img-block {
+    margin-right: 15px;
+  }
+
+  .all-content-block {
+    padding: 50px 10px;
+  }
+
+  .content-block a {
+    font-size: 16px;
+  }
+
+  .subscribers {
+    padding-left: 0px;
+    padding-top: 10px;
+  }
+
+  .add-poem {
+    height: 40px;
+    width: 120px;
+  }
+
+  .add-poem a {
+    font-size: 14px;
+  }
+
+  .own-data-block div:not(:last-child) {
+    font-size: 18px;
+  }
+
+  .email {
+    padding-bottom: 15px;
+  }
+
+  .description {
+    padding: 15px 0px;
+    font-size: 14px;
+  }
+  .refactor-block a {
+    font-size: 18px;
+  }
+  .refactor-block {
+    padding-bottom: 60px;
+  }
+}
+
+@media (max-width: 335px) {
+  .img-block {
+    margin-right: 5px;
+  }
+
+  .all-content-block {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .content-block a {
+    font-size: 15px;
+  }
+
+  .img-block {
+    height: 150px;
+    flex: 0 0 150px;
+  }
+
+  .add-poem {
+    height: 35px;
+    width: 100px;
+  }
+
+  .add-poem a {
+    font-size: 14px;
+  }
+
+  .own-data-block div:not(:last-child) {
+    font-size: 17px;
+  }
+
+  .refactor-block a {
+    font-size: 17px;
+  }
+}
+
+/*      
+      
+      <div class="main-container">
+        <div class="content-block">
+          <div class="general-data-block">
+            <div class="img-block">
+              <img src="images/icons/contact.png" alt="" />
+            </div>
+            <div class="content-block">
+              <div class="sub-block">
+                <div class="subscriptions">
+                  <a>Підписки<span>100</span></a>
+                </div>
+                <div class="subscribers">
+                  <a>Підписники<span>100</span></a>
+                </div>
+                <div class="poems">
+                  <a href="">Вірші <span>123</span></a>
+                </div>
+                <div class="add-poem">
+                  <input type="button" value="Додати вірші" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="own-data-block">
+            <div class="name">Ригаль Денис</div>
+            <div class="email">dsdfgfg@gmail.com</div>
+            <div class="description">
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nobis,
+              quas? Officiis quisquam tempora voluptatum neque soluta
+              voluptates. Blanditiis eveniet asperiores sed? Porro, laboriosam
+              nesciunt. Esse eius eum consectetur est voluptates.
+            </div>
+          </div>
+        </div>
+        <div class="refactor-block">
+          <a href="refactor"> Редагувати проіль </a>
+        </div>
+      </div>
+      */

@@ -27,12 +27,23 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     private final AuthorRepository authorRepository;
 
     @Override
-    public Page<PoemsDto> getAllPublicPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable) {
-        return getAllPublicPoems(authorId,currentUserId,pageable);
+    public Page<PoemsDto> getAllPublicPoemsByAuthorIdAndContainText(Long authorId, Long currentUserId, String poemName, Pageable pageable) {
+        return getAllPublicPoems(authorId, currentUserId, poemName, pageable);
     }
 
-    private Page<PoemsDto> getAllPublicPoems(Long id, Long currentUserId, Pageable pageable) {
+    private Page<PoemsDto> getAllPublicPoems(Long authorId, Long currentUserId,String poemName, Pageable pageable){
+        return poemName.isEmpty()? getPublicPoemsByAuthorId(authorId, currentUserId, pageable):
+                getPublicPoemsByAuthorIdWhichContainText(authorId, currentUserId, poemName, pageable);
+    }
+
+    private Page<PoemsDto> getPublicPoemsByAuthorId(Long id, Long currentUserId, Pageable pageable) {
         var poems =  poemRepository.findAllPublicPoemsByAuthorId(id,currentUserId,pageable);
+        checkPoemsPageIsNotEmpty(poems);
+        return poems;
+    }
+
+    private Page<PoemsDto> getPublicPoemsByAuthorIdWhichContainText(Long id, Long currentUserId, String poemName, Pageable pageable) {
+        var poems =  poemRepository.findAllPublicPoemsByAuthorIdWhichContainsText(id,currentUserId,poemName,pageable);
         checkPoemsPageIsNotEmpty(poems);
         return poems;
     }

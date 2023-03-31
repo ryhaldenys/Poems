@@ -62,7 +62,7 @@ public class PoemRepositoryTest {
         var currentUser = authors.get(4);
         var poemsDtos = mapPublicPoemsToPoemsDto(currentUser);
 
-        var foundPoems = poemRepository.findAllPoemsByName(currentUser.getId(),Pageable.unpaged(),poemsDtos.get(2).getName())
+        var foundPoems = poemRepository.findAllPoemsWhichContainText(currentUser.getId(),Pageable.unpaged(),poemsDtos.get(2).getName())
                 .getContent();
         System.out.println(foundPoems);
 

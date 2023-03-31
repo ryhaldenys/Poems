@@ -16,20 +16,20 @@ import java.util.Optional;
 
 public interface PoemRepository extends JpaRepository<Poem,Long> {
 
-    @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l)," +
-            "sum(case when l.id =?1 then 1 else 0 end))" +
+    @Query("select new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l)," +
+            "sum(case when l.id =:id then 1 else 0 end))" +
             " from Poem p join p.author a left join p.likes l where p.status = 'PUBLIC' " +
-            "group by p.id,a.fullName")
-    Page<PoemsDto> findAllPoems(Long currentUserId,Pageable pageable);
+            "group by p.id,a.fullName ")
+    Page<PoemsDto> findAllPoems(@Param("id") Long currentUserId,Pageable pageable);
 
-    @QueryHints(
-            @QueryHint(name ="org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH",value = "false"))
-    @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l) ," +
+
+    @Query("select new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l) ," +
             "sum(case when l.id =:id then 1 else 0 end)) " +
             "from Poem p join p.author a left join p.likes l " +
-            "where p.name like CONCAT('%',:name,'%') and p.status ='PUBLIC' " +
-            "group by p.id,a.fullName")
-    Page<PoemsDto> findAllPoemsByName(@Param("id")Long currentUserId,Pageable pageable, @Param("name") String name);
+            "where (lower(p.name) like lower(CONCAT('%',:name,'%')) or " +
+            "lower(p.text) like lower(CONCAT('%',:name,'%'))) and p.status ='PUBLIC' " +
+            "group by p.id,a.fullName ")
+    Page<PoemsDto> findAllPoemsWhichContainText(@Param("id")Long currentUserId, Pageable pageable, @Param("name") String name);
 
     @Query("select new ua.poems_club.dto.poem.PoemDto(p.id,p.name,p.text,p.status,a.id,a.fullName)" +
             " from Poem p join p.author a where p.id =?1")
@@ -41,9 +41,18 @@ public interface PoemRepository extends JpaRepository<Poem,Long> {
             "group by p.id,a.fullName")
     Page<PoemsDto> findAllPublicPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable);
 
-
-
     @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l) ," +
+            "sum(case when l.id =:currentAuthorId then 1 else 0 end)) " +
+            "from Poem p join p.author a left join p.likes l " +
+            "where a.id =:authorId and p.status = 'PUBLIC' and (lower(p.name) like lower(CONCAT('%',:name,'%'))" +
+            "or lower(p.text) like lower(CONCAT('%',:name,'%'))) " +
+            "group by p.id,a.fullName")
+    Page<PoemsDto> findAllPublicPoemsByAuthorIdWhichContainsText(@Param("authorId") Long authorId, @Param("currentAuthorId") Long currentUserId,
+                                                                 @Param("name") String poemName, Pageable pageable);
+
+
+
+    @Query("select new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l) ," +
             "sum(case when l.id =?2 then 1 else 0 end)) " +
             "from Poem p join p.author a left join p.likes l where a.id =?1 " +
             "group by p.id,a.fullName")
@@ -65,8 +74,19 @@ public interface PoemRepository extends JpaRepository<Poem,Long> {
     Optional<Poem> findPoemByIdFetchLikes(Long poemId);
 
     @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l)," +
-            "sum(case when l.id =?1 then 1 else 0 end)) " +
-            "from Poem p join p.author a left join p.likes l where p.status = 'PUBLIC' and l.id =?1 " +
+            "sum(case when l.id =:id then 1 else 0 end)) " +
+            "from Poem p join p.author a left join p.likes l " +
+            "where p.status = 'PUBLIC' and l.id =:id " +
             "group by p.id,a.fullName")
-    Page<PoemsDto> findAllAuthorLikes(Long currentUserId,Pageable pageable);
+    Page<PoemsDto> findAllAuthorLikes(@Param("id") Long currentUserId,Pageable pageable);
+
+    @Query("select distinct new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l)," +
+            "sum(case when l.id =:id then 1 else 0 end)) " +
+            "from Poem p join p.author a left join p.likes l " +
+            "where (lower(p.name) like lower(CONCAT('%',:name,'%')) or " +
+            "lower(p.text) like lower(CONCAT('%',:name,'%'))) and p.status = 'PUBLIC' and l.id =:id " +
+            "group by p.id,a.fullName")
+    Page<PoemsDto> findAllAuthorLikesWhichContainText(@Param("id") Long currentUserId, @Param("name") String name, Pageable pageable);
+
+
 }

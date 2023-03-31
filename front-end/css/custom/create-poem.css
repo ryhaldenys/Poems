@@ -1,0 +1,232 @@
+.main-poem-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-poem-block {
+  padding: 15px 0px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 100px;
+}
+
+.title-block {
+  padding-top: 110px;
+  padding-bottom: 20px;
+}
+
+.title-text {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.title {
+  padding: 10px 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title label {
+  font-size: 20px;
+  padding-bottom: 10px;
+}
+
+.title input {
+  border: 1px solid black;
+  border-radius: 10px;
+  font-size: 16px;
+  padding-bottom: 10px;
+  height: 50px;
+  width: 600px;
+}
+
+.title input[placeholder] {
+  padding: 0px 10px;
+}
+
+.body {
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.body label {
+  font-size: 20px;
+  padding-bottom: 10px;
+}
+
+.body textarea {
+  border: 1px solid black;
+  border-radius: 10px;
+  height: 280px;
+  font-size: 16px;
+  resize: none;
+}
+
+.error-message {
+  padding-top: 2px;
+  font-size: 14px;
+  color: red;
+}
+
+.body textarea[placeholder] {
+  padding: 10px;
+}
+
+.checkbox-wrapper {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-wrapper input {
+  height: 0px;
+  width: 0px;
+}
+
+.checkbox-wrapper *,
+.checkbox-wrapper *:after,
+.checkbox-wrapper *:before {
+  box-sizing: border-box;
+}
+
+.checkbox-wrapper input {
+  position: absolute;
+  opacity: 0;
+}
+
+.checkbox-wrapper input:checked + label svg path {
+  stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper input:focus + label {
+  transform: scale(1.03);
+}
+
+.checkbox-wrapper input + label {
+  display: block;
+  border: 2px solid black;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkbox-wrapper input + label:active {
+  transform: scale(1.05);
+  border-radius: 12px;
+}
+
+.checkbox-wrapper input + label svg {
+  pointer-events: none;
+  padding: 5%;
+}
+
+.checkbox-wrapper input + label svg path {
+  fill: none;
+  stroke: black;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 101;
+  transition: all 250ms cubic-bezier(1, 0, 0.37, 0.91);
+}
+
+.isPublic {
+  padding-left: 5px;
+}
+
+.button-block {
+  padding-top: 20px;
+}
+
+.button-block input {
+  width: 120px;
+  height: 45px;
+  background-color: black;
+  color: white;
+  border: 1px solid black;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .main-poem-block {
+    padding-bottom: 60px;
+  }
+  .create-poem-block {
+    padding: 15px 5px;
+    width: 100%;
+  }
+
+  .title-text {
+    font-size: 35px;
+  }
+
+  .title {
+    padding: 10px 0px;
+  }
+
+  .title label {
+    font-size: 18px;
+    padding-bottom: 10px;
+  }
+
+  .title input {
+    font-size: 15px;
+    width: auto;
+  }
+
+  .title input[placeholder] {
+    padding: 0px 10px;
+  }
+
+  .body {
+    padding-top: 20px;
+  }
+
+  .body label {
+    font-size: 20px;
+    padding-bottom: 10px;
+  }
+
+  .body textarea {
+    height: 220px;
+    font-size: 15px;
+    width: auto;
+  }
+
+  .body textarea[placeholder] {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .title-text {
+    font-size: 30px;
+  }
+}
+/*
+            <div class="title">
+              <label for="title">Назва вірша</label>
+              <input type="text" id="title" />
+            </div>
+            <div class="body">
+              <label for="body">Текст</label>
+              <textarea name="Текст" id="body" cols="30" rows="10"> </textarea>
+            </div>
+            <div class="checkbox">
+              <label for="checkbox">Публічно</label>
+              <input type="checkbox" />
+            </div>
+          </div>
+          <div class="button-block">
+            <input type="button" value="Cтворити" />
+          </div>
+        </div>
+      </div>*/
