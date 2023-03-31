@@ -1,0 +1,2 @@
+Copy code
+web: java -jar back-end/poems-back-end.jar
