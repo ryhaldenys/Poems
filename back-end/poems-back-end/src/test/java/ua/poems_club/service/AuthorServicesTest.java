@@ -40,9 +40,12 @@ import static ua.poems_club.model.Poem.Status.PRIVATE;
 @RequiredArgsConstructor
 @ActiveProfiles(profiles = "test")
 @Transactional
-public class AuthorServiceTest {
+public class AuthorServicesTest {
     @Autowired
-    private AuthorService authorService;
+    private GettingDataAuthorService gettingDataAuthorService;
+    @Autowired
+    private ManipulationAuthorService manipulationAuthorService;
+
     @Autowired
     private BCryptPasswordEncoder encoder;
 
@@ -54,6 +57,9 @@ public class AuthorServiceTest {
     @Value("${upload.path}")
     private String uploadPath;
 
+    @Value("${default.image}")
+    private String defaultName;
+
     @BeforeEach
     void setUp() {
         addDataToDB();
@@ -64,7 +70,7 @@ public class AuthorServiceTest {
         authorRepository.deleteAll();
         var pageable = Pageable.unpaged();
         assertThatException()
-                .isThrownBy(()-> authorService.getAllAuthors(1L,pageable));
+                .isThrownBy(()-> gettingDataAuthorService.getAllAuthors(1L,"",pageable));
 
     }
 
@@ -73,7 +79,7 @@ public class AuthorServiceTest {
         var author = authors.get(0);
         var currentUser = authors.get(1).getId();
         var pageable = Pageable.unpaged();
-        var authors = authorService.getAllAuthors(currentUser,pageable).getContent();
+        var authors = gettingDataAuthorService.getAllAuthors(currentUser,"",pageable).getContent();
 
         assertThat(authors.get(0).getId()).isEqualTo(author.getId());
 
@@ -82,7 +88,7 @@ public class AuthorServiceTest {
     @Test
     void getAuthorByIdTest(){
         var author = authors.get(2);
-        var foundAuthor = authorService.getAuthorById(author.getId());
+        var foundAuthor = gettingDataAuthorService.getAuthorById(author.getId());
 
         assertThat(foundAuthor.getId()).isEqualTo(author.getId());
 
@@ -90,15 +96,15 @@ public class AuthorServiceTest {
 
     @Test
     void getAuthorByIdWhenUserIsAbsentTest(){
-        assertThatThrownBy(()->authorService.getAuthorById(100042L))
+        assertThatThrownBy(()-> gettingDataAuthorService.getAuthorById(100042L))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void updateAuthorTest(){
         var id = authors.get(0).getId();
-        var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello","password");
-        authorService.updateAuthor(id,updateAuthorDto);
+        var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello");
+        manipulationAuthorService.updateAuthor(id,updateAuthorDto);
         authorRepository.flush();
 
         var author = authorRepository.findById(id)
@@ -114,7 +120,7 @@ public class AuthorServiceTest {
 
         var request = new RegistrationRequestDto("fullName","email","password");
 
-        var author = authorService.createAuthor(request);
+        var author = manipulationAuthorService.createAuthor(request);
         authorRepository.flush();
 
         var optionalAuthor = authorRepository.findById(author.getId());
@@ -127,7 +133,7 @@ public class AuthorServiceTest {
         var author = authors.get(1);
         var request = new RegistrationRequestDto("fullName",author.getEmail(),"password");
 
-        assertThatThrownBy(()->authorService.createAuthor(request))
+        assertThatThrownBy(()-> manipulationAuthorService.createAuthor(request))
                 .isInstanceOf(AuthorAlreadyExist.class);
 
     }
@@ -137,7 +143,7 @@ public class AuthorServiceTest {
         var author = authors.get(1);
         var request = new RegistrationRequestDto(author.getFullName(),"new-email","password");
 
-        assertThatThrownBy(()->authorService.createAuthor(request))
+        assertThatThrownBy(()-> manipulationAuthorService.createAuthor(request))
                 .isInstanceOf(AuthorAlreadyExist.class);
 
     }
@@ -145,9 +151,9 @@ public class AuthorServiceTest {
     @Test
     void updateAbsentAuthorTest(){
         var id = 121312423L;
-        var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello","password");
+        var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello");
 
-        assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
+        assertThatThrownBy(()-> manipulationAuthorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -155,9 +161,9 @@ public class AuthorServiceTest {
     void updateUserWithEmailWhichAlreadyExistTest(){
         var id = authors.get(0).getId();
         var email = authors.get(1).getEmail();
-        var updateAuthorDto = new UpdateAuthorDto("Denys Denys",email,"hello","password");
+        var updateAuthorDto = new UpdateAuthorDto("Denys Denys",email,"hello");
 
-        assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
+        assertThatThrownBy(()-> manipulationAuthorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(AuthorAlreadyExist.class);
     }
 
@@ -165,9 +171,9 @@ public class AuthorServiceTest {
     void updateUserWithFullNameWhichAlreadyExistTest(){
         var id = authors.get(0).getId();
         var fullName = authors.get(1).getFullName();
-        var updateAuthorDto = new UpdateAuthorDto(fullName,"new@gmail.com","hello","password");
+        var updateAuthorDto = new UpdateAuthorDto(fullName,"new@gmail.com","hello");
 
-        assertThatThrownBy(()->authorService.updateAuthor(id,updateAuthorDto))
+        assertThatThrownBy(()-> manipulationAuthorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(AuthorAlreadyExist.class);
     }
 
@@ -181,7 +187,7 @@ public class AuthorServiceTest {
         authorRepository.flush();
         var password = new PasswordDto(authorPassword,"newpassword");
 
-        authorService.updateAuthorPassword(author.getId(),password);
+        manipulationAuthorService.updateAuthorPassword(author.getId(),password);
         authorRepository.flush();
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
@@ -197,7 +203,7 @@ public class AuthorServiceTest {
 
         var password = new PasswordDto("wrongOldPassword","newpassword");
 
-        assertThatThrownBy(()->authorService.updateAuthorPassword(author.getId(),password))
+        assertThatThrownBy(()-> manipulationAuthorService.updateAuthorPassword(author.getId(),password))
                 .isInstanceOf(IncorrectAuthorDetailsException.class);
 
     }
@@ -205,12 +211,12 @@ public class AuthorServiceTest {
     @Test
     void getAuthorByEmailTest(){
         var author = authors.get(0);
-        var foundAuthor = authorService.getAuthorByEmail(author.getEmail());
+        var foundAuthor = gettingDataAuthorService.getAuthorByEmail(author.getEmail());
         assertThat(foundAuthor).isEqualTo(author);
     }
     @Test
     void getAuthorByWrongEmailTest(){
-        assertThatThrownBy(()->authorService.getAuthorByEmail("wrongemail@gmail.com"))
+        assertThatThrownBy(()-> gettingDataAuthorService.getAuthorByEmail("wrongemail@gmail.com"))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -218,7 +224,7 @@ public class AuthorServiceTest {
     void deleteAuthorTest(){
         var author = authors.get(1);
 
-        authorService.deleteAuthor(author.getId());
+        manipulationAuthorService.deleteAuthor(author.getId());
         authorRepository.flush();
 
         boolean isAuthor = authorRepository.findById(author.getId()).isPresent();
@@ -237,7 +243,7 @@ public class AuthorServiceTest {
                 "Hello, World!".getBytes()
         );
 
-        authorService.addAuthorImage(author.getId(), multipartFile);
+        manipulationAuthorService.addAuthorImage(author.getId(), multipartFile);
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
         assertThat(foundAuthor.getImageName().contains("hello.png")).isTrue();
@@ -250,7 +256,7 @@ public class AuthorServiceTest {
     void addAuthorImageByWrongPathTest(){
         var author = authors.get(2);
 
-        assertThatThrownBy(()->authorService.addAuthorImage(author.getId(), null))
+        assertThatThrownBy(()-> manipulationAuthorService.addAuthorImage(author.getId(), null))
                 .isInstanceOf(InvalidImagePathException.class);
 
     }
@@ -259,7 +265,7 @@ public class AuthorServiceTest {
     void addSubscriptionTest(){
         var author = authors.get(0);
         var subscription = authors.get(4);
-        authorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
+        manipulationAuthorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
         authorRepository.flush();
 
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
@@ -273,7 +279,7 @@ public class AuthorServiceTest {
         var subscription = authors.get(1);
         author.addSubscription(subscription);
 
-        authorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
+        manipulationAuthorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
         authorRepository.flush();
 
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
@@ -293,12 +299,12 @@ public class AuthorServiceTest {
         var foundAuthor = authorRepository.findById(author.getId())
                 .orElseThrow();
 
-        authorService.deleteImage(author.getId());
+        manipulationAuthorService.deleteImage(author.getId());
         authorRepository.flush();
 
         assertThat(fileIsCreated).isTrue();
         assertThat(file.exists()).isFalse();
-        assertThat(foundAuthor.getImageName()).isNull();
+        assertThat(foundAuthor.getImageName()).isEqualTo(defaultName);
 
     }
 
@@ -307,8 +313,8 @@ public class AuthorServiceTest {
     void getAuthorSubscriptionsTest(){
         var author = authors.get(0);
 
-        var subscriptions = authorService
-                .getAuthorSubscriptions(author.getId(),Pageable.unpaged())
+        var subscriptions = gettingDataAuthorService
+                .getAuthorSubscriptions(author.getId(),"",Pageable.unpaged())
                 .getContent();
 
         var firstAuthorSubscription = authors.get(1);
@@ -326,8 +332,8 @@ public class AuthorServiceTest {
     void getAuthorSubscribersTest(){
         var author = authors.get(1);
 
-        var subscribers = authorService
-                .getAuthorSubscribers(author.getId(),Pageable.unpaged())
+        var subscribers = gettingDataAuthorService
+                .getAuthorSubscribers(author.getId(),"",Pageable.unpaged())
                 .getContent();
 
         var subscriber = authors.get(0);
@@ -340,8 +346,8 @@ public class AuthorServiceTest {
     void getAuthorLikesTest(){
         var author = authors.get(0);
 
-        var likes = authorService
-                .getAuthorLikes(author.getId(),Pageable.unpaged())
+        var likes = gettingDataAuthorService
+                .getAuthorLikes(author.getId(),"",Pageable.unpaged())
                 .getContent();
 
         assertThat(likes.get(0).getName())
