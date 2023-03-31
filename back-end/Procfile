@@ -1,2 +1,2 @@
 Copy code
-web: java -jar back-end/poems-back-end.jar
+web: java -jar target/poems-back-end.jar
