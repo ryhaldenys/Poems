@@ -1,1 +1,1 @@
-worker: sh -c 
+web: cd $PROJECT_PATH && ./mvnw spring-boot:run
