@@ -3,6 +3,7 @@ package ua.poems_club.config;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -31,6 +32,5 @@ public class AmazonS3Config {
     public ObjectMetadata objectMetadata(){
         return new ObjectMetadata();
     }
-
 
 }
