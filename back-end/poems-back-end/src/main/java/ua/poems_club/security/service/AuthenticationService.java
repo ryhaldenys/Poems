@@ -8,13 +8,13 @@ import ua.poems_club.model.Author;
 import ua.poems_club.security.dto.AuthenticationRequestDto;
 import ua.poems_club.security.dto.AuthenticationResponseDto;
 import ua.poems_club.security.model.JwtTokenProvider;
-import ua.poems_club.service.GettingDataAuthorService;
+import ua.poems_club.service.DataMapperAuthorService;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
-    private final GettingDataAuthorService service;
+    private final DataMapperAuthorService service;
     private final JwtTokenProvider tokenProvider;
 
     public AuthenticationResponseDto authenticate(AuthenticationRequestDto request){

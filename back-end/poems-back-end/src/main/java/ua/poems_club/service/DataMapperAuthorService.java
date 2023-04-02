@@ -6,7 +6,7 @@ import ua.poems_club.dto.author.*;
 import ua.poems_club.dto.poem.PoemsDto;
 import ua.poems_club.model.Author;
 
-public interface GettingDataAuthorService {
+public interface DataMapperAuthorService {
     Page<AuthorsDto> getAllAuthors(Long id,String authorName,Pageable pageable);
     Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id, Pageable pageable);
 

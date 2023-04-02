@@ -16,8 +16,8 @@ import ua.poems_club.model.Author;
 import ua.poems_club.security.dto.AuthenticationResponseDto;
 import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.security.service.AuthenticationService;
-import ua.poems_club.service.GettingDataAuthorService;
-import ua.poems_club.service.ManipulationAuthorService;
+import ua.poems_club.service.DataMapperAuthorService;
+import ua.poems_club.service.ManagementAuthorService;
 
 import java.net.URI;
 
@@ -28,33 +28,33 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 public class AuthorController {
     private final AuthenticationService authenticationService;
-    private final GettingDataAuthorService gettingDataAuthorService;
-    private final ManipulationAuthorService manipulationAuthorService;
+    private final DataMapperAuthorService dataMapperAuthorService;
+    private final ManagementAuthorService managementAuthorService;
 
     @GetMapping
     public Page<AuthorsDto> getAll(Pageable pageable, @AuthenticationPrincipal SecurityUser currentUser,
                                    @RequestParam(defaultValue = "",name ="name") String authorName){
-        return gettingDataAuthorService.getAllAuthors(currentUser.getId(),authorName,pageable);
+        return dataMapperAuthorService.getAllAuthors(currentUser.getId(),authorName,pageable);
     }
 
 
     @GetMapping("/most-popular")
     public Page<AuthorsDto> getAllSortedBySubscribers(Pageable pageable, @AuthenticationPrincipal SecurityUser currentUser){
-        return gettingDataAuthorService.getAuthorsSortedBySubscribers(currentUser.getId(),pageable);
+        return dataMapperAuthorService.getAuthorsSortedBySubscribers(currentUser.getId(),pageable);
     }
 
 
 
     @GetMapping("/{id}")
     public AuthorDto getAuthor(@PathVariable Long id){
-        return gettingDataAuthorService.getAuthorById(id);
+        return dataMapperAuthorService.getAuthorById(id);
     }
 
 
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAuthor(@PathVariable Long id, @RequestBody UpdateAuthorDto author){
-        var updatedAuthor = manipulationAuthorService.updateAuthor(id,author);
+        var updatedAuthor = managementAuthorService.updateAuthor(id,author);
         var token = authenticationService.createToken(updatedAuthor);
 
         var response = new AuthenticationResponseDto(id,token);
@@ -66,7 +66,7 @@ public class AuthorController {
 
     @PatchMapping("/{id}/password")
     public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody PasswordDto password){
-        manipulationAuthorService.updateAuthorPassword(id,password);
+        managementAuthorService.updateAuthorPassword(id,password);
 
         var uri = getUriFromCurrentRequest();
 
@@ -78,44 +78,44 @@ public class AuthorController {
     @PostMapping(value = "/{id}/image")
     @ResponseStatus(NO_CONTENT)
     public void addImage(@PathVariable Long id,@RequestPart("file") MultipartFile multipartFile){
-        manipulationAuthorService.addAuthorImage(id,multipartFile);
+        managementAuthorService.addAuthorImage(id,multipartFile);
     }
 
     @DeleteMapping(value = "/{id}/image")
     @ResponseStatus(NO_CONTENT)
     public void deleteImage(@PathVariable Long id){
-        manipulationAuthorService.deleteImage(id);
+        managementAuthorService.deleteImage(id);
     }
 
     @PatchMapping("{id}/subscriptions/{subscription_id}")
     @ResponseStatus(NO_CONTENT)
     public void updateAuthorSubscriptions(@PathVariable Long id, @PathVariable("subscription_id") Long subscriptionId){
-        manipulationAuthorService.updateAuthorSubscriptions(id,subscriptionId);
+        managementAuthorService.updateAuthorSubscriptions(id,subscriptionId);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('simple')")
     public Author deleteAuthor(@PathVariable Long id){
-        return manipulationAuthorService.deleteAuthor(id);
+        return managementAuthorService.deleteAuthor(id);
     }
 
 
     @GetMapping("/{id}/subscriptions")
     public Page<AuthorsDto> getSubscriptions(@PathVariable Long id,Pageable pageable,
                                              @RequestParam(defaultValue = "",name = "name")String authorName){
-        return gettingDataAuthorService.getAuthorSubscriptions(id,authorName,pageable);
+        return dataMapperAuthorService.getAuthorSubscriptions(id,authorName,pageable);
     }
 
     @GetMapping("/{id}/subscribers")
     public Page<AuthorsDto> getSubscribers(@PathVariable Long id,Pageable pageable,
                                            @RequestParam(defaultValue = "",name = "name")String authorName){
-        return gettingDataAuthorService.getAuthorSubscribers(id,authorName,pageable);
+        return dataMapperAuthorService.getAuthorSubscribers(id,authorName,pageable);
     }
 
     @GetMapping("/{id}/likes")
     public Page<PoemsDto> getLikes(@PathVariable Long id,Pageable pageable,
                                    @RequestParam(defaultValue = "",name = "poemName")String poemName){
-        return gettingDataAuthorService.getAuthorLikes(id,poemName,pageable);
+        return dataMapperAuthorService.getAuthorLikes(id,poemName,pageable);
     }
 
 
