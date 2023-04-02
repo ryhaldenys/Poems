@@ -6,7 +6,7 @@ import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.model.Author;
 import ua.poems_club.security.dto.RegistrationRequestDto;
 
-public interface ManipulationAuthorService {
+public interface ManagementAuthorService {
     Author createAuthor(RegistrationRequestDto author);
     Author updateAuthor(Long id, UpdateAuthorDto author);
     void updateAuthorPassword(Long id, PasswordDto password);

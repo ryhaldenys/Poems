@@ -29,8 +29,8 @@ import ua.poems_club.model.Author;
 import ua.poems_club.security.model.JwtTokenProvider;
 import ua.poems_club.security.model.SecurityUser;
 import ua.poems_club.security.service.AuthenticationService;
-import ua.poems_club.service.GettingDataAuthorService;
-import ua.poems_club.service.ManipulationAuthorService;
+import ua.poems_club.service.DataMapperAuthorService;
+import ua.poems_club.service.ManagementAuthorService;
 
 import java.util.List;
 import java.util.Objects;
@@ -55,10 +55,10 @@ public class AuthorControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private GettingDataAuthorService service;
+    private DataMapperAuthorService service;
 
     @MockBean
-    private ManipulationAuthorService manipulationAuthorService;
+    private ManagementAuthorService managementAuthorService;
 
     @MockBean
     private AuthenticationService authenticationService;
@@ -163,7 +163,7 @@ public class AuthorControllerTest {
         var author = authors.get(2);
         var authorDto = new UpdateAuthorDto(author.getFullName(), author.getEmail(), author.getDescription());
 
-        BDDMockito.willThrow(AuthorAlreadyExist.class).given(manipulationAuthorService).updateAuthor(author.getId(),authorDto);
+        BDDMockito.willThrow(AuthorAlreadyExist.class).given(managementAuthorService).updateAuthor(author.getId(),authorDto);
 
         mockMvc.perform(put("/api/authors/"+author.getId())
                         .contentType(APPLICATION_JSON)
@@ -203,7 +203,7 @@ public class AuthorControllerTest {
         var password = new PasswordDto("old","new");
 
         BDDMockito.willThrow(IncorrectAuthorDetailsException.class)
-                .given(manipulationAuthorService).updateAuthorPassword(author.getId(),password);
+                .given(managementAuthorService).updateAuthorPassword(author.getId(),password);
 
         mockMvc.perform(patch("/api/authors/"+author.getId()+"/password")
                         .contentType(APPLICATION_JSON)
@@ -247,10 +247,10 @@ public class AuthorControllerTest {
     void deleteAuthorTest(){
         var author = authors.get(0);
 
-        when(manipulationAuthorService.deleteAuthor(author.getId()))
+        when(managementAuthorService.deleteAuthor(author.getId()))
                 .thenReturn(author);
 
-        when(manipulationAuthorService.deleteAuthor(1L)).thenReturn(author);
+        when(managementAuthorService.deleteAuthor(1L)).thenReturn(author);
 
         mockMvc.perform(delete("/api/authors/1")
                         .with(csrf()))

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ua.poems_club.builder.AuthorBuilder;
 import ua.poems_club.dto.author.PasswordDto;
@@ -18,23 +17,20 @@ import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.security.dto.RegistrationRequestDto;
-import ua.poems_club.service.ManipulationAuthorService;
+import ua.poems_club.service.AmazonImageService;
+import ua.poems_club.service.ManagementAuthorService;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ManipulationAuthorServiceImpl implements ManipulationAuthorService {
+public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     private final AuthorRepository authorRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    @Value("${upload.path}")
-    private String uploadPath;
+    private final AmazonImageService amazonImageService;
 
     @Value("${default.image}")
     private String defaultImage;
@@ -147,12 +143,19 @@ public class ManipulationAuthorServiceImpl implements ManipulationAuthorService 
     @Transactional
     public Author deleteAuthor(Long id) {
         var author = getAuthorFetchAllFields(id);
+        deleteAuthorImage(author);
         deleteSubscribers(author);
         deleteSubscriptions(author);
         deletePoemsWithLikes(author);
         deleteMyLikes(author);
         deleteAuthorById(id);
         return author;
+    }
+
+    private void deleteAuthorImage(Author author) {
+        var image =author.getImageName();
+        if (!image.equals(defaultImage))
+            amazonImageService.deleteImage(image);
     }
 
     private Author getAuthorFetchAllFields(Long id){
@@ -199,7 +202,6 @@ public class ManipulationAuthorServiceImpl implements ManipulationAuthorService 
     private void addImage(Author author, MultipartFile multipartFile) {
         try {
             checkIsImagePathNotNull(multipartFile);
-            createDirectoryIfNotExist();
             deleteOldImageIfItExist(author);
 
             String fileName = generateUniqueFileName(multipartFile);
@@ -215,7 +217,7 @@ public class ManipulationAuthorServiceImpl implements ManipulationAuthorService 
     private void deleteOldImageIfItExist(Author author) throws IOException {
         var imageName = author.getImageName();
         if (!imageName.equals(defaultImage)){
-            FileSystemUtils.deleteRecursively(Path.of(uploadPath+"/"+imageName));
+            amazonImageService.deleteImage(imageName);
         }
     }
 
@@ -224,20 +226,13 @@ public class ManipulationAuthorServiceImpl implements ManipulationAuthorService 
             throw new InvalidImagePathException("Gotten file is invalid");
     }
 
-    private void createDirectoryIfNotExist(){
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()){
-            uploadDir.mkdir();
-        }
-    }
-
     private String generateUniqueFileName(MultipartFile multipartFile){
         String uuidFile = UUID.randomUUID().toString();
         return uuidFile+"."+ multipartFile.getOriginalFilename();
     }
 
     private void saveImage(MultipartFile multipartFile, String fileName) throws IOException {
-        multipartFile.transferTo(new File(uploadPath +"/"+fileName));
+        amazonImageService.saveImage(fileName, multipartFile);
     }
 
     private void setNewImageToAuthor(Author author,String fileName) {
