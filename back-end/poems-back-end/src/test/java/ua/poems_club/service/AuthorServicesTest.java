@@ -13,7 +13,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileSystemUtils;
 import ua.poems_club.dto.author.PasswordDto;
 import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
@@ -25,8 +24,6 @@ import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.security.dto.RegistrationRequestDto;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 
@@ -42,9 +39,11 @@ import static ua.poems_club.model.Poem.Status.PRIVATE;
 @Transactional
 public class AuthorServicesTest {
     @Autowired
-    private GettingDataAuthorService gettingDataAuthorService;
+    private DataMapperAuthorService gettingDataAuthorService;
     @Autowired
-    private ManipulationAuthorService manipulationAuthorService;
+    private AmazonImageService amazonImageService;
+    @Autowired
+    private ManagementAuthorService managementAuthorService;
 
     @Autowired
     private BCryptPasswordEncoder encoder;
@@ -53,9 +52,6 @@ public class AuthorServicesTest {
     private AuthorRepository authorRepository;
     private List<Author> authors;
     private List<Poem> poems;
-
-    @Value("${upload.path}")
-    private String uploadPath;
 
     @Value("${default.image}")
     private String defaultName;
@@ -104,7 +100,7 @@ public class AuthorServicesTest {
     void updateAuthorTest(){
         var id = authors.get(0).getId();
         var updateAuthorDto = new UpdateAuthorDto("Denys Ryhal","new@gmail.com","hello");
-        manipulationAuthorService.updateAuthor(id,updateAuthorDto);
+        managementAuthorService.updateAuthor(id,updateAuthorDto);
         authorRepository.flush();
 
         var author = authorRepository.findById(id)
@@ -120,7 +116,7 @@ public class AuthorServicesTest {
 
         var request = new RegistrationRequestDto("fullName","email","password");
 
-        var author = manipulationAuthorService.createAuthor(request);
+        var author = managementAuthorService.createAuthor(request);
         authorRepository.flush();
 
         var optionalAuthor = authorRepository.findById(author.getId());
@@ -133,7 +129,7 @@ public class AuthorServicesTest {
         var author = authors.get(1);
         var request = new RegistrationRequestDto("fullName",author.getEmail(),"password");
 
-        assertThatThrownBy(()-> manipulationAuthorService.createAuthor(request))
+        assertThatThrownBy(()-> managementAuthorService.createAuthor(request))
                 .isInstanceOf(AuthorAlreadyExist.class);
 
     }
@@ -143,7 +139,7 @@ public class AuthorServicesTest {
         var author = authors.get(1);
         var request = new RegistrationRequestDto(author.getFullName(),"new-email","password");
 
-        assertThatThrownBy(()-> manipulationAuthorService.createAuthor(request))
+        assertThatThrownBy(()-> managementAuthorService.createAuthor(request))
                 .isInstanceOf(AuthorAlreadyExist.class);
 
     }
@@ -153,7 +149,7 @@ public class AuthorServicesTest {
         var id = 121312423L;
         var updateAuthorDto = new UpdateAuthorDto("Denys Denys","new@gmail.com","hello");
 
-        assertThatThrownBy(()-> manipulationAuthorService.updateAuthor(id,updateAuthorDto))
+        assertThatThrownBy(()-> managementAuthorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -163,7 +159,7 @@ public class AuthorServicesTest {
         var email = authors.get(1).getEmail();
         var updateAuthorDto = new UpdateAuthorDto("Denys Denys",email,"hello");
 
-        assertThatThrownBy(()-> manipulationAuthorService.updateAuthor(id,updateAuthorDto))
+        assertThatThrownBy(()-> managementAuthorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(AuthorAlreadyExist.class);
     }
 
@@ -173,7 +169,7 @@ public class AuthorServicesTest {
         var fullName = authors.get(1).getFullName();
         var updateAuthorDto = new UpdateAuthorDto(fullName,"new@gmail.com","hello");
 
-        assertThatThrownBy(()-> manipulationAuthorService.updateAuthor(id,updateAuthorDto))
+        assertThatThrownBy(()-> managementAuthorService.updateAuthor(id,updateAuthorDto))
                 .isInstanceOf(AuthorAlreadyExist.class);
     }
 
@@ -187,7 +183,7 @@ public class AuthorServicesTest {
         authorRepository.flush();
         var password = new PasswordDto(authorPassword,"newpassword");
 
-        manipulationAuthorService.updateAuthorPassword(author.getId(),password);
+        managementAuthorService.updateAuthorPassword(author.getId(),password);
         authorRepository.flush();
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
@@ -203,7 +199,7 @@ public class AuthorServicesTest {
 
         var password = new PasswordDto("wrongOldPassword","newpassword");
 
-        assertThatThrownBy(()-> manipulationAuthorService.updateAuthorPassword(author.getId(),password))
+        assertThatThrownBy(()-> managementAuthorService.updateAuthorPassword(author.getId(),password))
                 .isInstanceOf(IncorrectAuthorDetailsException.class);
 
     }
@@ -224,7 +220,7 @@ public class AuthorServicesTest {
     void deleteAuthorTest(){
         var author = authors.get(1);
 
-        manipulationAuthorService.deleteAuthor(author.getId());
+        managementAuthorService.deleteAuthor(author.getId());
         authorRepository.flush();
 
         boolean isAuthor = authorRepository.findById(author.getId()).isPresent();
@@ -243,11 +239,12 @@ public class AuthorServicesTest {
                 "Hello, World!".getBytes()
         );
 
-        manipulationAuthorService.addAuthorImage(author.getId(), multipartFile);
+        managementAuthorService.addAuthorImage(author.getId(), multipartFile);
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
         assertThat(foundAuthor.getImageName().contains("hello.png")).isTrue();
-        FileSystemUtils.deleteRecursively(Path.of(uploadPath + "/" + foundAuthor.getImageName()));
+        amazonImageService.deleteImage(foundAuthor.getImageName());
+
     }
 
 
@@ -256,7 +253,7 @@ public class AuthorServicesTest {
     void addAuthorImageByWrongPathTest(){
         var author = authors.get(2);
 
-        assertThatThrownBy(()-> manipulationAuthorService.addAuthorImage(author.getId(), null))
+        assertThatThrownBy(()-> managementAuthorService.addAuthorImage(author.getId(), null))
                 .isInstanceOf(InvalidImagePathException.class);
 
     }
@@ -265,7 +262,7 @@ public class AuthorServicesTest {
     void addSubscriptionTest(){
         var author = authors.get(0);
         var subscription = authors.get(4);
-        manipulationAuthorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
+        managementAuthorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
         authorRepository.flush();
 
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
@@ -279,7 +276,7 @@ public class AuthorServicesTest {
         var subscription = authors.get(1);
         author.addSubscription(subscription);
 
-        manipulationAuthorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
+        managementAuthorService.updateAuthorSubscriptions(author.getId(),subscription.getId());
         authorRepository.flush();
 
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
@@ -293,17 +290,13 @@ public class AuthorServicesTest {
     void deleteImageTest(){
         var author = authors.get(0);
 
-        File file = new File(uploadPath+"/"+author.getImageName());
-        var fileIsCreated =  file.createNewFile();
-
         var foundAuthor = authorRepository.findById(author.getId())
                 .orElseThrow();
 
-        manipulationAuthorService.deleteImage(author.getId());
+        managementAuthorService.deleteImage(author.getId());
         authorRepository.flush();
 
-        assertThat(fileIsCreated).isTrue();
-        assertThat(file.exists()).isFalse();
+
         assertThat(foundAuthor.getImageName()).isEqualTo(defaultName);
 
     }

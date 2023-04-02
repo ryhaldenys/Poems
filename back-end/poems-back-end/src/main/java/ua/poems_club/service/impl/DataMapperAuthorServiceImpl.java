@@ -16,21 +16,17 @@ import ua.poems_club.model.Author;
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.repository.PoemRepository;
 
-import ua.poems_club.service.GettingDataAuthorService;
+import ua.poems_club.service.AmazonImageService;
+import ua.poems_club.service.DataMapperAuthorService;
 
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class GettingDataAuthorServiceImpl implements GettingDataAuthorService {
+public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     private final AuthorRepository authorRepository;
-
-    @Value("${upload.path}")
-    private String uploadPath;
-
-    @Value("${file.path}")
-    private String imagePath;
+    private final AmazonImageService amazonImageService;
 
     @Value("${default.image}")
     private String defaultImage;
@@ -79,10 +75,13 @@ public class GettingDataAuthorServiceImpl implements GettingDataAuthorService {
     }
 
     private void setImagePath(AuthorsDto author){
-        if (Objects.isNull(author.getImagePath()))
-            author.setImagePath(imagePath+uploadPath+"/"+defaultImage);
-        else
-            author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
+        if (Objects.isNull(author.getImagePath())) {
+            var imageUrl = amazonImageService.getImage(defaultImage);
+            author.setImagePath(imageUrl);
+        }else {
+            var imageUrl = amazonImageService.getImage(author.getImagePath());
+            author.setImagePath(imageUrl);
+        }
     }
 
     @Override
@@ -98,7 +97,7 @@ public class GettingDataAuthorServiceImpl implements GettingDataAuthorService {
     }
 
     private void setImagePath(AuthorDto author) {
-        author.setImagePath(imagePath+uploadPath+"/"+author.getImagePath());
+        author.setImagePath(amazonImageService.getImage(author.getImagePath()));
     }
 
 
