@@ -1,4 +1,4 @@
-const requestURL = 'https://poems-back-end-app.herokuapp.com/api/poems?page=0&size=6&sort=createdAt,desc'
+const requestURL = 'http://localhost:8080/api/poems?page=0&size=6&sort=createdAt,desc'
 
 import * as lib  from "./methods.js";
 
@@ -12,7 +12,6 @@ const poems = document.querySelector(".poems-container");
 const loadingBlock = document.querySelector('.data-loading');
 const contentBlock = document.querySelector('.content-block');
 
-console.log(localStorage.getItem('token'));
 
 checkIsAuthorithation();
 
@@ -70,9 +69,6 @@ function loadData() {
   }
 }
 
-console.log(poems);
-
-
 
 ////////////////// add likes
 
@@ -96,18 +92,11 @@ lib.updateLike(likeButtons, countLikesFields, content,"white");
 
 const authors_container = document.querySelector('.authors-container');
 
-const getAuthorsUrl = "https://poems-back-end-app.herokuapp.com/api/authors/most-popular?page=0&size=6";
+const getAuthorsUrl = "http://localhost:8080/api/authors/most-popular?page=0&size=6";
 
 const response = await lib.sendRequest('GET', getAuthorsUrl)
   .then(data => data.content)
   .catch(err => console.log(err));
-
-
-console.log(response);
-
-
-console.log(authors_container);
-
 
 for (let i = response.length -1 ; i >= 0 ; i--) {
   var div = document.createElement("div");

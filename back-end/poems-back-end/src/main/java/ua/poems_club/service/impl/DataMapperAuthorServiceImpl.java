@@ -2,6 +2,7 @@ package ua.poems_club.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,25 +29,20 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     private final AuthorRepository authorRepository;
     private final AmazonImageService amazonImageService;
 
-    @Value("${default.image}")
+    @Value("${DEFAULT_IMG_NAME}")
     private String defaultImage;
 
     private final PoemRepository poemRepository;
 
 
     @Override
+    @Cacheable(value = "authors",key = "#currentAuthorId")
     public Page<AuthorsDto> getAllAuthors(Long currentAuthorId,String authorName,Pageable pageable) {
         var authors = getAuthors(currentAuthorId, authorName, pageable);
         setImagePathForAll(authors);
         return authors;
     }
 
-    @Override
-    public Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id,Pageable pageable) {
-        var authors = getAllSortedBySubscribers(id,pageable);
-        setImagePathForAll(authors);
-        return authors;
-    }
 
     private Page<AuthorsDto> getAllSortedBySubscribers(Long id, Pageable pageable){
         var authors = authorRepository.findAuthorsSortedBySubscribers(id,pageable);
@@ -65,11 +61,37 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
         return authors;
     }
 
+    @Override
+    @Cacheable(value = "authors",key = "#id")
+    public Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id,Pageable pageable) {
+        var authors = getAllSortedBySubscribers(id,pageable);
+        setImagePathForAll(authors);
+        return authors;
+    }
+
+
     private Page<AuthorsDto> getAllByName(Long currentAuthorId,String authorName, Pageable pageable) {
         var authors = authorRepository.findAllAuthorsByAuthorName(currentAuthorId,authorName,pageable);
         checkAreAuthors(authors);
         return authors;
     }
+
+
+
+    @Override
+    @Cacheable(value = "authors",key = "#id")
+    public Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id,Pageable pageable) {
+        var authors = getAllSortedBySubscribers(id,pageable);
+        setImagePathForAll(authors);
+        return authors;
+    }
+
+    private Page<AuthorsDto> getAllSortedBySubscribers(Long id, Pageable pageable){
+        var authors = authorRepository.findAuthorsSortedBySubscribers(id,pageable);
+        checkAreAuthors(authors);
+        return authors;
+    }
+
     private void setImagePathForAll(Page<AuthorsDto> authors) {
         authors.getContent().forEach(this::setImagePath);
     }
@@ -85,6 +107,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     }
 
     @Override
+    @Cacheable(value = "author",key = "#id")
     public AuthorDto getAuthorById(Long id) {
         var author = getById(id);
         setImagePath(author);
@@ -118,6 +141,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
 
 
     @Override
+    @Cacheable(value = "authors",key = "#id")
     public Page<AuthorsDto> getAuthorSubscriptions(Long id,String authorName,Pageable pageable) {
         return getSubscriptions(id,authorName,pageable);
     }
@@ -145,6 +169,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
 
 
     @Override
+    @Cacheable(value = "authors",key = "#id")
     public Page<AuthorsDto> getAuthorSubscribers(Long id,String authorName,Pageable pageable) {
         return getSubscribers(id,authorName,pageable);
     }
@@ -176,6 +201,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     }
 
     @Override
+    @Cacheable(value = "likes",key = "#id")
     public Page<PoemsDto> getAuthorLikes(Long id,String poemName,Pageable pageable) {
         return getLikes(id,poemName,pageable);
     }
