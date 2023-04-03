@@ -1,4 +1,4 @@
-const requestURL = 'http://localhost:8080/api/poems?page=0&size=6&sort=createdAt,desc'
+const requestURL = 'https://poems-back-end-app.herokuapp.com/api/poems?page=0&size=6&sort=createdAt,desc'
 
 import * as lib  from "./methods.js";
 
@@ -96,7 +96,7 @@ lib.updateLike(likeButtons, countLikesFields, content,"white");
 
 const authors_container = document.querySelector('.authors-container');
 
-const getAuthorsUrl = "http://localhost:8080/api/authors/most-popular?page=0&size=6";
+const getAuthorsUrl = "https://poems-back-end-app.herokuapp.com/api/authors/most-popular?page=0&size=6";
 
 const response = await lib.sendRequest('GET', getAuthorsUrl)
   .then(data => data.content)

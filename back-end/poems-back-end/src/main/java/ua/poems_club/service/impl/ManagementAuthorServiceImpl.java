@@ -2,8 +2,6 @@ package ua.poems_club.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,12 +32,12 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AmazonImageService amazonImageService;
 
-    @Value("${DEFAULT_IMG_NAME}")
+    @Value("${default.image}")
     private String defaultImage;
+
 
     @Override
     @Transactional
-    @CacheEvict(value = "authors",allEntries = true)
     public Author createAuthor(RegistrationRequestDto author) {
         return create(author);
     }
@@ -87,10 +85,6 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "authors",allEntries = true),
-            @CacheEvict(value = "author",key = "#id")
-    })
     public Author updateAuthor(Long id, UpdateAuthorDto author) {
         var foundAuthor = getAuthor(id);
         checkIsOtherAuthorWithFullName(foundAuthor,author);
@@ -147,7 +141,6 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "authors",allEntries = true)
     public Author deleteAuthor(Long id) {
         var author = getAuthorFetchAllFields(id);
         deleteAuthorImage(author);
@@ -201,10 +194,6 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "authors",allEntries = true),
-            @CacheEvict(value = "author",key = "#id")
-    })
     public void addAuthorImage(Long id, MultipartFile imageUrl) {
         var author = getAuthor(id);
         addImage(author,imageUrl);
@@ -253,10 +242,6 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @Caching(evict = {
-        @CacheEvict(value = "author", key = "#authorId"),
-        @CacheEvict(value = "authors",allEntries = true)
-    })
     public void updateAuthorSubscriptions(Long authorId, Long subscriptionId) {
         var author = getAuthorFetchSubscriptions(authorId);
         var subscription = getAuthorFetchSubscribers(subscriptionId);
@@ -296,10 +281,6 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "author", allEntries = true),
-            @CacheEvict(value = "authors",key = "#id")
-    })
     public void deleteImage(Long id) {
         delete(id);
     }

@@ -3,7 +3,7 @@ import * as lib from "./methods.js";
 const urlParams = new URLSearchParams(window.location.search);
 const poemId = urlParams.get('id');
 
-const requestUrl = 'http://localhost:8080/api/poems/' + poemId;
+const requestUrl = 'https://poems-back-end-app.herokuapp.com/api/poems/' + poemId;
 const main_container = document.querySelector('.main-container');
 
 const htmlForInnering = `

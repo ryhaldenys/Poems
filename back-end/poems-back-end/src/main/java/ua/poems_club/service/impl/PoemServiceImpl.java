@@ -1,7 +1,6 @@
 package ua.poems_club.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ public class PoemServiceImpl implements PoemService {
     private final PoemRepository poemRepository;
 
     @Override
-    @Cacheable("poems")
     public Page<PoemsDto> getAllPoems(Long currentUserId, Pageable pageable, String name) {
         return getPoems(currentUserId,pageable,name);
     }
@@ -49,7 +47,6 @@ public class PoemServiceImpl implements PoemService {
     }
 
     @Override
-    @Cacheable("poem")
     public PoemDto getPoemById(Long id) {
         return getById(id);
     }

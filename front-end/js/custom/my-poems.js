@@ -1,6 +1,6 @@
 import * as lib from './methods.js';
 
-const requestUrl = `http://localhost:8080/api/authors/${localStorage.getItem('id')}/poems/own?sort=createdAt,desc`;
+const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${localStorage.getItem('id')}/poems/own?sort=createdAt,desc`;
 
 const poems = document.querySelector('.poems');
 
@@ -92,7 +92,7 @@ deletePoem(response);
 function deletePoem(data) {   
     for (let i = 0; i < delete_blocks.length; i++){
         delete_blocks[i].addEventListener('click', () => {
-            const deleteRequest = `http://localhost:8080/api/authors/${localStorage.getItem('id')}/poems/${data[i].id}`;
+            const deleteRequest = `https://poems-back-end-app.herokuapp.com/api/authors/${localStorage.getItem('id')}/poems/${data[i].id}`;
             lib.sendRequest('DELETE', deleteRequest)
                 .catch(err => console.log(err));
             
@@ -115,7 +115,7 @@ updatePoemsStatus(response);
 function updatePoemsStatus(data) { 
     for (let i = 0; i < update_button.length; i++) {
         update_button[i].addEventListener('click', () => { 
-            const updateUrl = `http://localhost:8080/api/authors/${localStorage.getItem('id')}/poems/${data[i].id}`;
+            const updateUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${localStorage.getItem('id')}/poems/${data[i].id}`;
             let status = getNewStatus(statuses[i]);
             let body = createBody(data[i].name, data[i].text, status);
             lib.sendRequestWithBody('PUT', updateUrl, body)
