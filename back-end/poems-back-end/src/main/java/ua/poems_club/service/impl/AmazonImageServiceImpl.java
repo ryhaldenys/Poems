@@ -25,7 +25,7 @@ public class AmazonImageServiceImpl implements AmazonImageService {
 
     private final int EXPIRATION = 1000 * 60 * 60;
 
-    @Value("${BUCKET_NAME}")
+    @Value("${amazon.backet-name}")
     private String bucketName;
 
     @Override
