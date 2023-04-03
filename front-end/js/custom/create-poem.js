@@ -5,7 +5,7 @@ const body = document.getElementById('body');
 const checkBox = document.getElementById('check');
 const errorBlock = document.querySelectorAll('.error-message');
 
-const requestUrl = `http://localhost:8080/api/authors/${localStorage.getItem('id')}/poems`;
+const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${localStorage.getItem('id')}/poems`;
 
 const createButton = document.querySelector('.create-button');
 const refactorButton = document.querySelector('.refactor-button');
@@ -35,7 +35,7 @@ async function refactorPoem() {
 async function setDataInInputs() { 
     let poemId = getPoemId();
     console.log(poemId);
-    const getRequestUrl = `http://localhost:8080/api/poems/${poemId}`;
+    const getRequestUrl = `https://poems-back-end-app.herokuapp.com/api/poems/${poemId}`;
     let poem = await lib.sendRequest('GET', getRequestUrl)
                     .then(data => data)
                     .catch(err => err);
