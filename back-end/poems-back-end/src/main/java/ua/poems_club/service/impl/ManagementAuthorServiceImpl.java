@@ -255,7 +255,7 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Transactional
     @Caching(evict = {
         @CacheEvict(value = "author", key = "#authorId"),
-        @CacheEvict(value = "authors",allEntries = true)
+        @CacheEvict(value = "authors",allEntries = true),
         @CacheEvict(value = "author", key = "#authorId"),
         @CacheEvict(value = "authors",allEntries = true)
     })
