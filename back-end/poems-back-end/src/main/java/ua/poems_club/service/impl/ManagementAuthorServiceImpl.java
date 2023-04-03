@@ -39,7 +39,10 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "authors",allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "authors", allEntries = true),
+            @CacheEvict(value = "sorted-authors", allEntries = true),
+    })
     public Author createAuthor(RegistrationRequestDto author) {
         return create(author);
     }
@@ -88,7 +91,10 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "authors",allEntries = true),
+            @CacheEvict(value = "authors", allEntries = true),
+            @CacheEvict(value = "subscriptions", allEntries = true),
+            @CacheEvict(value = "subscribers", allEntries = true),
+            @CacheEvict(value = "sorted-authors", allEntries = true),
             @CacheEvict(value = "author",key = "#id")
     })
     public Author updateAuthor(Long id, UpdateAuthorDto author) {
@@ -147,7 +153,13 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "authors",allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "authors", allEntries = true),
+            @CacheEvict(value = "subscriptions", allEntries = true),
+            @CacheEvict(value = "subscribers", allEntries = true),
+            @CacheEvict(value = "sorted-authors", allEntries = true),
+            @CacheEvict(value = "author",key = "#id")
+    })
     public Author deleteAuthor(Long id) {
         var author = getAuthorFetchAllFields(id);
         deleteAuthorImage(author);
@@ -202,7 +214,10 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "authors",allEntries = true),
+            @CacheEvict(value = "authors", allEntries = true),
+            @CacheEvict(value = "subscriptions", allEntries = true),
+            @CacheEvict(value = "subscribers", allEntries = true),
+            @CacheEvict(value = "sorted-authors", allEntries = true),
             @CacheEvict(value = "author",key = "#id")
     })
     public void addAuthorImage(Long id, MultipartFile imageUrl) {
@@ -254,8 +269,11 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "author", key = "#authorId"),
-        @CacheEvict(value = "authors",allEntries = true)
+            @CacheEvict(value = "authors", allEntries = true),
+            @CacheEvict(value = "subscriptions", allEntries = true),
+            @CacheEvict(value = "subscribers", allEntries = true),
+            @CacheEvict(value = "sorted-authors", allEntries = true),
+            @CacheEvict(value = "author",key = "#id")
     })
     public void updateAuthorSubscriptions(Long authorId, Long subscriptionId) {
         var author = getAuthorFetchSubscriptions(authorId);
@@ -298,8 +316,10 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "authors", allEntries = true),
-            @CacheEvict(value = "author",key = "#id")
-    })
+            @CacheEvict(value = "subscriptions", allEntries = true),
+            @CacheEvict(value = "subscribers", allEntries = true),
+            @CacheEvict(value = "sorted-authors", allEntries = true),
+            @CacheEvict(value = "author",key = "#id")})
     public void deleteImage(Long id) {
         delete(id);
     }

@@ -21,7 +21,7 @@ public class PoemServiceImpl implements PoemService {
     private final PoemRepository poemRepository;
 
     @Override
-    @Cacheable("poems")
+    @Cacheable(value = "poems", key = "#name")
     public Page<PoemsDto> getAllPoems(Long currentUserId, Pageable pageable, String name) {
         return getPoems(currentUserId,pageable,name);
     }
