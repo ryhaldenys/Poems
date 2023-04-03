@@ -9,7 +9,7 @@ const MIN_PASSWORD_LENGTH = 5;
 const id = localStorage.getItem('id');
 
 
-const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${id}/password`;
+const requestUrl = `http://localhost:8080/api/authors/${id}/password`;
 changePasswordButton.addEventListener('click', async () => { 
 
     if (checkPasswordLength(oldPassword) && checkPasswordLength(newPassword)) {

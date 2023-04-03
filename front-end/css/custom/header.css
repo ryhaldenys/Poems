@@ -75,7 +75,6 @@ body {
 }
 
 #navbar-toggle {
-  mix-blend-mode: difference;
   cursor: pointer;
   border: none;
   background-color: transparent;
@@ -86,13 +85,6 @@ body {
   justify-content: center;
   flex-direction: column;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --navbar-text-color: hsl(0, 0%, 100%);
-  }
-}
-
 .icon-bar {
   display: block;
   width: 25px;
@@ -100,7 +92,6 @@ body {
   margin: 2px;
   background-color: var(--navbar-text-color);
 }
-
 #navbar-toggle:is(:focus, :hover) .icon-bar {
   background-color: var(--navbar-text-color-focus);
 }
