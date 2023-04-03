@@ -14,8 +14,6 @@ import ua.poems_club.service.AmazonImageService;
 import java.io.IOException;
 
 import java.util.Date;
-import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
