@@ -351,6 +351,9 @@
   }
 }
 
+body {
+  color-scheme: light;
+}
 /*      
       
       <div class="main-container">

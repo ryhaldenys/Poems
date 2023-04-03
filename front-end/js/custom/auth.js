@@ -93,7 +93,6 @@ submitButton.addEventListener('submit', (event) => {
 });
 
 function saveData(body) { 
-    console.log(body);
     localStorage.setItem('id', body.id);
     localStorage.setItem('token', body.token);
 }
