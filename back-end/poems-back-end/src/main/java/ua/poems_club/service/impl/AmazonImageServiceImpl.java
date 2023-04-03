@@ -14,6 +14,7 @@ import ua.poems_club.service.AmazonImageService;
 import java.io.IOException;
 
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -24,7 +25,7 @@ public class AmazonImageServiceImpl implements AmazonImageService {
 
     private final int EXPIRATION = 1000 * 60 * 60;
 
-    @Value("${BUCKET_NAME}")
+    @Value("${amazon.backet-name}")
     private String bucketName;
 
     @Override
