@@ -24,7 +24,7 @@ function createForm() {
 }
 
 async function sendRequest(requestData) {
-    await fetch(`https://poems-back-end-app.herokuapp.com/api/authors/${id}/image`, {
+    await fetch(`http://localhost:8080/api/authors/${id}/image`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -39,7 +39,7 @@ async function sendRequest(requestData) {
 deleteImage();
 
 function deleteImage() {
-    const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${id}/image`;
+    const requestUrl = `http://localhost:8080/api/authors/${id}/image`;
     deleteImageButton.addEventListener('click', async () => {
         await lib.sendRequest('DELETE', requestUrl)
             .catch(err => console.log(err));
@@ -55,7 +55,7 @@ async function insertImage() {
 
 
 async function loadData() { 
-    const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${id}`;
+    const requestUrl = `http://localhost:8080/api/authors/${id}`;
     return lib.sendRequest('GET', requestUrl)
         .then(data => data)
         .catch(err => console.log(err));

@@ -1,7 +1,7 @@
 import { sendRequest } from "./methods.js";
 
 
-const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${localStorage.getItem('id')}`;
+const requestUrl = `http://localhost:8080/api/authors/${localStorage.getItem('id')}`;
 const img = document.querySelector(".img-block");
 const sub_block = document.querySelector(".sub-block");
 const poems = document.querySelector(".poems");
@@ -26,6 +26,10 @@ function checkIsAuthorithation() {
 const responce = await sendRequest("GET", requestUrl)
     .then(data => data)
     .catch(err => console.log(err));
+
+
+console.log(sub_block);
+console.log(poems);
 
 console.log(responce);
 

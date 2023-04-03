@@ -254,8 +254,10 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "author", key = "#authorId"),
-            @CacheEvict(value = "authors",allEntries = true)
+        @CacheEvict(value = "author", key = "#authorId"),
+        @CacheEvict(value = "authors",allEntries = true)
+        @CacheEvict(value = "author", key = "#authorId"),
+        @CacheEvict(value = "authors",allEntries = true)
     })
     public void updateAuthorSubscriptions(Long authorId, Long subscriptionId) {
         var author = getAuthorFetchSubscriptions(authorId);

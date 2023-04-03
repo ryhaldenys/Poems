@@ -43,6 +43,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
         return authors;
     }
 
+
     private Page<AuthorsDto> getAllSortedBySubscribers(Long id, Pageable pageable){
         var authors = authorRepository.findAuthorsSortedBySubscribers(id,pageable);
         checkAreAuthors(authors);
@@ -74,6 +75,23 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
         checkAreAuthors(authors);
         return authors;
     }
+
+
+
+    @Override
+    @Cacheable(value = "authors",key = "#id")
+    public Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id,Pageable pageable) {
+        var authors = getAllSortedBySubscribers(id,pageable);
+        setImagePathForAll(authors);
+        return authors;
+    }
+
+    private Page<AuthorsDto> getAllSortedBySubscribers(Long id, Pageable pageable){
+        var authors = authorRepository.findAuthorsSortedBySubscribers(id,pageable);
+        checkAreAuthors(authors);
+        return authors;
+    }
+
     private void setImagePathForAll(Page<AuthorsDto> authors) {
         authors.getContent().forEach(this::setImagePath);
     }
