@@ -47,10 +47,10 @@ export function updateLike(likeFields,countLikeFields,data, color) {
     likeFields[i].addEventListener("click", async () => { 
     
     let url = `http://localhost:8080/api/authors/${localStorage.getItem('id')}/poems/${poemContent.id}/likes`;
-    console.log(url);
+    
    
     let like = likeFields[i].getAttribute('src'); 
-    console.log(like);
+  
     let countLikes = countLikeFields[i].textContent; 
     sendRequest('PATCH', url)
       .catch(err => console.log(err));

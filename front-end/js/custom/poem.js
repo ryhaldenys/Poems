@@ -18,7 +18,6 @@ const data = await lib.sendRequest('GET', requestUrl)
     .then(data => data)
     .catch(err => console.log(err));
 
-console.log(data);
 innerData(data);
 
 

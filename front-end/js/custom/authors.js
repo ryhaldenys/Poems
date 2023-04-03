@@ -27,7 +27,7 @@ loadData();
 find_button.addEventListener('click', async () => {
     let value = find_field.value;
     main_content.innerHTML = getLoadingBlock();
-    console.log(value);
+
     loadData(value);
 });
 

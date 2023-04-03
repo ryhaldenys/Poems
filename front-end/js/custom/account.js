@@ -31,8 +31,6 @@ const responce = await sendRequest("GET", requestUrl)
 console.log(sub_block);
 console.log(poems);
 
-console.log(responce);
-
 addData(responce);
 
 function addData(data) { 

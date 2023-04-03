@@ -12,7 +12,6 @@ const poems = document.querySelector(".poems-container");
 const loadingBlock = document.querySelector('.data-loading');
 const contentBlock = document.querySelector('.content-block');
 
-console.log(localStorage.getItem('token'));
 
 checkIsAuthorithation();
 
@@ -70,9 +69,6 @@ function loadData() {
   }
 }
 
-console.log(poems);
-
-
 
 ////////////////// add likes
 
@@ -101,13 +97,6 @@ const getAuthorsUrl = "http://localhost:8080/api/authors/most-popular?page=0&siz
 const response = await lib.sendRequest('GET', getAuthorsUrl)
   .then(data => data.content)
   .catch(err => console.log(err));
-
-
-console.log(response);
-
-
-console.log(authors_container);
-
 
 for (let i = response.length -1 ; i >= 0 ; i--) {
   var div = document.createElement("div");
