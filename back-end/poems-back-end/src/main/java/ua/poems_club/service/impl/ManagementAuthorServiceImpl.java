@@ -273,7 +273,7 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
             @CacheEvict(value = "subscriptions", allEntries = true),
             @CacheEvict(value = "subscribers", allEntries = true),
             @CacheEvict(value = "sorted-authors", allEntries = true),
-            @CacheEvict(value = "author",key = "#id")
+            @CacheEvict(value = "author",key = "#authorId")
     })
     public void updateAuthorSubscriptions(Long authorId, Long subscriptionId) {
         var author = getAuthorFetchSubscriptions(authorId);
