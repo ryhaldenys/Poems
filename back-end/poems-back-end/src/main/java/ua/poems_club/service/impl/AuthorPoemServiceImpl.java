@@ -168,7 +168,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "likes",allEntries = true),
-            @CacheEvict(value = "author-poems"),
+            @CacheEvict(value = "author-poems",allEntries = true),
             @CacheEvict(value = "author",key = "#id")
     })
     public void updatePoemLikes(Long id, Long poemId) {
