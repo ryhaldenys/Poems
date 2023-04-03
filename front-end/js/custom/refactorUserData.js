@@ -12,7 +12,7 @@ const MIN_USERNAME_LENGTH = 3;
 const id = localStorage.getItem('id');
 
 
-const updateRequestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${id}`;
+const updateRequestUrl = `http://localhost:8080/api/authors/${id}`;
 
 updateDataButton.addEventListener('click', async () => {
 
