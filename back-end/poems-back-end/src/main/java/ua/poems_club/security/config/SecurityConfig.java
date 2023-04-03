@@ -43,6 +43,8 @@ public class SecurityConfig {
                 .and()
                 .apply(config);
 
+        http.cors();
+
         return http.build();
     }
 
