@@ -141,6 +141,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "likes",allEntries = true),
             @CacheEvict(value = "author-poems",key = "#id"),
+            @CacheEvict(value = "author")
     })
     public void deletePoem(Long id, Long poemId) {
         var poem = getPoemByAuthorIdAndIdFetchLikes(id,poemId);
@@ -167,7 +168,8 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "likes",allEntries = true),
-            @CacheEvict(value = "author-poems",key = "#id")
+            @CacheEvict(value = "author-poems"),
+            @CacheEvict(value = "author",key = "#id")
     })
     public void updatePoemLikes(Long id, Long poemId) {
         var poem = getPoemByIdFetchLikes(poemId);
@@ -194,3 +196,4 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
             poem.addLike(like);
     }
 }
+

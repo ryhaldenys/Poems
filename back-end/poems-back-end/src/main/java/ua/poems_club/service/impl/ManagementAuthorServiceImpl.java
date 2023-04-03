@@ -255,8 +255,6 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Transactional
     @Caching(evict = {
         @CacheEvict(value = "author", key = "#authorId"),
-        @CacheEvict(value = "authors",allEntries = true),
-        @CacheEvict(value = "author", key = "#authorId"),
         @CacheEvict(value = "authors",allEntries = true)
     })
     public void updateAuthorSubscriptions(Long authorId, Long subscriptionId) {
@@ -299,8 +297,8 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "author", allEntries = true),
-            @CacheEvict(value = "authors",key = "#id")
+            @CacheEvict(value = "authors", allEntries = true),
+            @CacheEvict(value = "author",key = "#id")
     })
     public void deleteImage(Long id) {
         delete(id);
