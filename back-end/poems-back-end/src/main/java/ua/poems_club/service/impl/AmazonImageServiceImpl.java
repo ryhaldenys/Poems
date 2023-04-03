@@ -15,7 +15,6 @@ import java.io.IOException;
 
 import java.util.Date;
 
-
 @Service
 @RequiredArgsConstructor
 public class AmazonImageServiceImpl implements AmazonImageService {

@@ -29,7 +29,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     private final AuthorRepository authorRepository;
     private final AmazonImageService amazonImageService;
 
-    @Value("${default.image}")
+    @Value("${DEFAULT_IMG_NAME}")
     private String defaultImage;
 
     private final PoemRepository poemRepository;
@@ -43,6 +43,13 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
         return authors;
     }
 
+
+    private Page<AuthorsDto> getAllSortedBySubscribers(Long id, Pageable pageable){
+        var authors = authorRepository.findAuthorsSortedBySubscribers(id,pageable);
+        checkAreAuthors(authors);
+        return authors;
+    }
+
     private Page<AuthorsDto> getAuthors(Long currentAuthorId, String authorName, Pageable pageable){
         return authorName.isEmpty() ? getAll(currentAuthorId,pageable):
                 getAllByName(currentAuthorId, authorName, pageable);
@@ -53,6 +60,15 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
         checkAreAuthors(authors);
         return authors;
     }
+
+    @Override
+    @Cacheable(value = "authors",key = "#id")
+    public Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id,Pageable pageable) {
+        var authors = getAllSortedBySubscribers(id,pageable);
+        setImagePathForAll(authors);
+        return authors;
+    }
+
 
     private Page<AuthorsDto> getAllByName(Long currentAuthorId,String authorName, Pageable pageable) {
         var authors = authorRepository.findAllAuthorsByAuthorName(currentAuthorId,authorName,pageable);
