@@ -1,4 +1,4 @@
-export const SIZE_OF_PAGE = 3;
+export const SIZE_OF_PAGE = 10;
 
 const urlParams = new URLSearchParams(window.location.search);
 let page = urlParams.get('page');
