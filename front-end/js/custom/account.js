@@ -1,7 +1,6 @@
 import { sendRequest } from "./methods.js";
 
-
-const requestUrl = `http://localhost:8080/api/authors/${localStorage.getItem('id')}`;
+const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${localStorage.getItem('id')}`;
 const img = document.querySelector(".img-block");
 const sub_block = document.querySelector(".sub-block");
 const poems = document.querySelector(".poems");

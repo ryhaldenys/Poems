@@ -54,48 +54,51 @@
           </div>
         </nav>
       </header>
-      <!--/header-->
-      <div class="title-block">
-        <div class="title-text">Написати вірш</div>
-      </div>
-      <div class="main-poem-block">
-        <div class="create-poem-block">
-          <div class="content-block">
-            <div class="title">
-              <label for="title">Назва вірша</label>
-              <input type="text" placeholder="Назва" id="title" />
-              <div class="error-message"></div>
-            </div>
-            <div class="body">
-              <label for="body">Текст</label>
-              <textarea
-                name="Текст"
-                id="body"
-                placeholder="Назва"
-                aria-valuetext=""
-              ></textarea>
-              <div class="error-message"></div>
-            </div>
+      <main>
+        <div class="title-block">
+          <div class="title-text">Написати вірш</div>
+        </div>
+        <div class="main-poem-block">
+          <div class="create-poem-block">
+            <div class="content-block">
+              <div class="title">
+                <label for="title">Назва вірша</label>
+                <input type="text" placeholder="Назва" id="title" />
+                <div class="error-message"></div>
+              </div>
+              <div class="body">
+                <label for="body">Текст</label>
+                <textarea
+                  name="Текст"
+                  id="body"
+                  placeholder="Назва"
+                  aria-valuetext=""
+                ></textarea>
+                <div class="error-message"></div>
+              </div>
 
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="check" />
-              <label for="check" style="--size: 30px">
-                <svg viewBox="0,0,50,50">
-                  <path d="M5 30 L 20 45 L 45 5"></path>
-                </svg>
-              </label>
-              <label class="isPublic" for="check">Публічно</label>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="check" />
+                <label for="check" style="--size: 30px">
+                  <svg viewBox="0,0,50,50">
+                    <path d="M5 30 L 20 45 L 45 5"></path>
+                  </svg>
+                </label>
+                <label class="isPublic" for="check">Публічно</label>
+              </div>
             </div>
-          </div>
-          <div class="button-block">
-            <input
-              type="button"
-              class="create-button button"
-              value="Cтворити"
-            />
+            <div class="button-block">
+              <input
+                type="button"
+                class="create-button button"
+                value="Cтворити"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </main>
+      <!--/header-->
+
       <!--footer-->
       <footer class="footer-container">
         <div class="footer-block">

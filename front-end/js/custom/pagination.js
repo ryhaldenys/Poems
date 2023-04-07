@@ -1,7 +1,4 @@
-
-
 export const SIZE_OF_PAGE = 3;
-
 
 const urlParams = new URLSearchParams(window.location.search);
 let page = urlParams.get('page');
@@ -15,7 +12,6 @@ export function getPage(){
         return page;
     }
 }
-
 
 export function setCorrectSettingForPagination(data,page,main_page,dataParam=''){ 
     let left_button = document.querySelector('.left');

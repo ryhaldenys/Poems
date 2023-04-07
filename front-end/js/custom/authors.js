@@ -3,7 +3,7 @@ import * as pag  from "./pagination.js";
 
 const page = pag.getPage();
 const SIZE_OF_PAGE = pag.SIZE_OF_PAGE;
-const halfOfRequest = 'http://localhost:8080/api/authors';
+const halfOfRequest = 'https://poems-back-end-app.herokuapp.com/api/authors';
 const pageableParameters = `?page=${page}&size=${SIZE_OF_PAGE}`;
 const userId = localStorage.getItem('id');
 
@@ -165,7 +165,7 @@ function checkAuthorIsCurrentUser(button, data) {
 
 
 function doEvent(data, subscribe_button_input, amountSubscribers) {
-    const updateRequest = `http://localhost:8080/api/authors/${localStorage.getItem('id')}/subscriptions/${data.id}`;
+    const updateRequest = halfOfRequest+`/${localStorage.getItem('id')}/subscriptions/${data.id}`;
         lib.sendRequest('PATCH', updateRequest)
             .catch(err => console.log(err));
         changeInputValue(subscribe_button_input,amountSubscribers);

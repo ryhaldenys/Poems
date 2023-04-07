@@ -53,38 +53,40 @@
           </div>
         </nav>
       </header>
-      <!--/header-->
-      <div class="title-block">
-        <div class="title-text">Написати вірш</div>
-      </div>
-      <div class="main-poem-block">
-        <div class="create-poem-block">
-          <div class="content-block">
-            <div class="title">
-              <label for="title">Назва вірша</label>
-              <input type="text" placeholder="Назва" id="title" />
-              <div class="error-message"></div>
+      <main>
+        <!--/header-->
+        <div class="title-block">
+          <div class="title-text">Написати вірш</div>
+        </div>
+        <div class="main-poem-block">
+          <div class="create-poem-block">
+            <div class="content-block">
+              <div class="title">
+                <label for="title">Назва вірша</label>
+                <input type="text" placeholder="Назва" id="title" />
+                <div class="error-message"></div>
+              </div>
+              <div class="body">
+                <label for="body">Текст</label>
+                <textarea
+                  name="Текст"
+                  id="body"
+                  placeholder="Назва"
+                  aria-valuetext=""
+                ></textarea>
+                <div class="error-message"></div>
+              </div>
             </div>
-            <div class="body">
-              <label for="body">Текст</label>
-              <textarea
-                name="Текст"
-                id="body"
-                placeholder="Назва"
-                aria-valuetext=""
-              ></textarea>
-              <div class="error-message"></div>
+            <div class="button-block">
+              <input
+                type="button"
+                class="refactor-button button"
+                value="Редагувати"
+              />
             </div>
-          </div>
-          <div class="button-block">
-            <input
-              type="button"
-              class="refactor-button button"
-              value="Редагувати"
-            />
           </div>
         </div>
-      </div>
+      </main>
       <!--footer-->
       <footer class="footer-container">
         <div class="footer-block">

@@ -8,6 +8,7 @@ const SIZE_OF_PAGE = pag.SIZE_OF_PAGE;
 const poems = document.querySelector(".poems");
 const find_field = document.querySelector('.type');
 const find_button = document.querySelector('.find');
+const mainLink = 'https://poems-back-end-app.herokuapp.com/api';
 
 
 checkIsAuthorithation();
@@ -51,11 +52,11 @@ function makeRequestForSubscriptions(value) {
   let id = localStorage.getItem('id');
 
   if (data == 'likes')
-    return `http://localhost:8080/api/authors/${id}/likes?page=${page}&size=${SIZE_OF_PAGE}&poemName=${value}`;
+    return `${mainLink}/authors/${id}/likes?page=${page}&size=${SIZE_OF_PAGE}&poemName=${value}`;
   else if(authorId != null)
-    return `http://localhost:8080/api/authors/${authorId}/poems?page=${page}&size=${SIZE_OF_PAGE}&poemName=${value}`;
+    return `${mainLink}/authors/${authorId}/poems?page=${page}&size=${SIZE_OF_PAGE}&poemName=${value}`;
 
-  return `http://localhost:8080/api/poems?page=${page}&size=${SIZE_OF_PAGE}&name=${value}`;
+  return `${mainLink}/poems?page=${page}&size=${SIZE_OF_PAGE}&name=${value}`;
 }
 
 
