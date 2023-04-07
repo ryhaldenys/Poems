@@ -36,7 +36,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
 
 
     @Override
-    @Cacheable(value = "authors",key = "#currentAuthorId")
+    @Cacheable(value = "authors",key = "#authorName + '_' + #pageable.pageNumber")
     public Page<AuthorsDto> getAllAuthors(Long currentAuthorId,String authorName,Pageable pageable) {
         var authors = getAuthors(currentAuthorId, authorName, pageable);
         setImagePathForAll(authors);
@@ -61,7 +61,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     }
 
     @Override
-    @Cacheable(value = "authors",key = "#id")
+    @Cacheable(value = "sorted-authors",key = "#id + '_' + #pageable.pageNumber")
     public Page<AuthorsDto> getAuthorsSortedBySubscribers(Long id,Pageable pageable) {
         var authors = getAllSortedBySubscribers(id,pageable);
         setImagePathForAll(authors);
@@ -125,7 +125,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
 
 
     @Override
-    @Cacheable(value = "authors",key = "#id")
+    @Cacheable(value = "subscriptions",key = "#authorName+'_'+#id+'_'+#pageable.pageNumber")
     public Page<AuthorsDto> getAuthorSubscriptions(Long id,String authorName,Pageable pageable) {
         return getSubscriptions(id,authorName,pageable);
     }
@@ -153,7 +153,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
 
 
     @Override
-    @Cacheable(value = "authors",key = "#id")
+    @Cacheable(value = "subscribers",key = "#authorName+'_'+#id+'_'+#pageable.pageNumber")
     public Page<AuthorsDto> getAuthorSubscribers(Long id,String authorName,Pageable pageable) {
         return getSubscribers(id,authorName,pageable);
     }
@@ -185,7 +185,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     }
 
     @Override
-    @Cacheable(value = "likes",key = "#id")
+    @Cacheable(value = "likes",key = "#poemName+'_'+#id+'_'+#pageable.pageNumber")
     public Page<PoemsDto> getAuthorLikes(Long id,String poemName,Pageable pageable) {
         return getLikes(id,poemName,pageable);
     }

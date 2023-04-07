@@ -30,7 +30,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     private final AuthorRepository authorRepository;
 
     @Override
-    @Cacheable(value ="author-poems",key = "#authorId")
+    @Cacheable(value ="author-poems",key = "#poemName+'_'+#currentUserId+'_'+#pageable.pageNumber")
     public Page<PoemsDto> getAllPublicPoemsByAuthorIdAndContainText(Long authorId, Long currentUserId, String poemName, Pageable pageable) {
         return getAllPublicPoems(authorId, currentUserId, poemName, pageable);
     }
@@ -60,7 +60,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
 
 
     @Override
-    @Cacheable(value = "author-poems",key = "#currentUserId")
+    @Cacheable(value = "own-poems",key = "#currentUserId+'_'+#pageable.pageNumber")
     public Page<PoemsDto> getAllPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable) {
         return getAllPoems(authorId, currentUserId, pageable);
     }
@@ -76,7 +76,8 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
-            @CacheEvict(value = "author-poems",key = "#authorId")
+            @CacheEvict(value = "author-poems",allEntries = true),
+            @CacheEvict(value = "own-poems",allEntries = true),
     })
     public void createPoem(Long authorId, RequestPoemDto poem) {
         var newPoem = createInstanceOfPoem(poem);
@@ -114,8 +115,9 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "likes",allEntries = true),
-            @CacheEvict(value = "poem",key = "#poemId"),
-            @CacheEvict(value = "author-poems",key = "#id")
+            @CacheEvict(value = "poem",allEntries = true),
+            @CacheEvict(value = "author-poems",allEntries = true),
+            @CacheEvict(value = "own-poems",allEntries = true),
     })
     public void updatePoem(Long id, Long poemId, RequestPoemDto request) {
         var poem = getPoemByAuthorIdAndId(id,poemId);
@@ -140,7 +142,9 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "likes",allEntries = true),
-            @CacheEvict(value = "author-poems",key = "#id"),
+            @CacheEvict(value = "author-poems",allEntries = true),
+            @CacheEvict(value = "own-poems",allEntries = true),
+            @CacheEvict(value = "author",allEntries = true)
     })
     public void deletePoem(Long id, Long poemId) {
         var poem = getPoemByAuthorIdAndIdFetchLikes(id,poemId);
@@ -167,7 +171,9 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "likes",allEntries = true),
-            @CacheEvict(value = "author-poems",key = "#id")
+            @CacheEvict(value = "author-poems",allEntries = true),
+            @CacheEvict(value = "own-poems",allEntries = true),
+            @CacheEvict(value = "author",key = "#id")
     })
     public void updatePoemLikes(Long id, Long poemId) {
         var poem = getPoemByIdFetchLikes(poemId);
@@ -194,3 +200,4 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
             poem.addLike(like);
     }
 }
+

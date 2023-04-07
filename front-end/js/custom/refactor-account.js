@@ -37,7 +37,7 @@ async function insertData() {
 
 
 async function loadData() { 
-    const requestUrl = `http://localhost:8080/api/authors/${id}`;
+    const requestUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${id}`;
     return lib.sendRequest('GET', requestUrl)
         .then(data => data)
         .catch(err => console.log(err));
@@ -47,7 +47,7 @@ async function loadData() {
 
 //////////////////////////////////////// delete account/////////////////////////////////
 
-const deleteUrl = `http://localhost:8080/api/authors/${id}`;
+const deleteUrl = `https://poems-back-end-app.herokuapp.com/api/authors/${id}`;
 
 removeAccountButton.addEventListener("click", () => {
     conf.openConfirmForm("Ви дійсно хочете видалити акаунт?").then(response=>{
