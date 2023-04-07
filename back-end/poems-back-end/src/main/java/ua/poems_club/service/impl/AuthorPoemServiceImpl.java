@@ -30,7 +30,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     private final AuthorRepository authorRepository;
 
     @Override
-    @Cacheable(value ="author-poems",key = "#poemName")
+    @Cacheable(value ="author-poems",key = "#poemName+'_'+#currentUserId+'_'+#pageable.pageNumber")
     public Page<PoemsDto> getAllPublicPoemsByAuthorIdAndContainText(Long authorId, Long currentUserId, String poemName, Pageable pageable) {
         return getAllPublicPoems(authorId, currentUserId, poemName, pageable);
     }
@@ -60,7 +60,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
 
 
     @Override
-    @Cacheable(value = "own-poems",key = "#currentUserId")
+    @Cacheable(value = "own-poems",key = "#currentUserId+'_'+#pageable.pageNumber")
     public Page<PoemsDto> getAllPoemsByAuthorId(Long authorId, Long currentUserId, Pageable pageable) {
         return getAllPoems(authorId, currentUserId, pageable);
     }
@@ -144,7 +144,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
             @CacheEvict(value = "likes",allEntries = true),
             @CacheEvict(value = "author-poems",allEntries = true),
             @CacheEvict(value = "own-poems",allEntries = true),
-            @CacheEvict(value = "author")
+            @CacheEvict(value = "author",allEntries = true)
     })
     public void deletePoem(Long id, Long poemId) {
         var poem = getPoemByAuthorIdAndIdFetchLikes(id,poemId);
