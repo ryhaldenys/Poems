@@ -77,6 +77,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     @Caching(evict = {
             @CacheEvict(value = "poems",allEntries = true),
             @CacheEvict(value = "author-poems",allEntries = true),
+            @CacheEvict(value = "author",key = "#authorId"),
             @CacheEvict(value = "own-poems",allEntries = true),
     })
     public void createPoem(Long authorId, RequestPoemDto poem) {
