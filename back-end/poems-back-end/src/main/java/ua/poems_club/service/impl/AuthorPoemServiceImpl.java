@@ -30,7 +30,7 @@ public class AuthorPoemServiceImpl implements AuthorPoemService {
     private final AuthorRepository authorRepository;
 
     @Override
-    @Cacheable(value ="author-poems",key = "#poemName+'_'+#currentUserId+'_'+#pageable.pageNumber")
+    @Cacheable(value ="author-poems",key = "#poemName+'_'+#currentUserId+'_'+#pageable.pageNumber+'_'+#authorId")
     public Page<PoemsDto> getAllPublicPoemsByAuthorIdAndContainText(Long authorId, Long currentUserId, String poemName, Pageable pageable) {
         return getAllPublicPoems(authorId, currentUserId, poemName, pageable);
     }
