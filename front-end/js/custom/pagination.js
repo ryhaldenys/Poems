@@ -13,14 +13,22 @@ export function getPage(){
     }
 }
 
-export function setCorrectSettingForPagination(data,page,main_page,dataParam=''){ 
+export function setCorrectSettingForPagination(data,page,main_page,dataParam = '',id = null,name = null){ 
     let left_button = document.querySelector('.left');
     let right_button = document.querySelector('.right');
     let counter = document.querySelector('.counter');
     counter.textContent = page + 1;
 
-    left_button.setAttribute('href', `${main_page}?page=${page - 1}&data=${dataParam}`);
-    right_button.setAttribute('href', `${main_page}?page=${page + 1}&data=${dataParam}`);
+    let prevPageUrl = `${main_page}?page=${page - 1}&data=${dataParam}`;
+    let nextPageUrl = `${main_page}?page=${page + 1}&data=${dataParam}`;
+
+    if (id != null && name!=null) {
+        prevPageUrl += `&id=${id}&name=${name}`;
+        nextPageUrl += `&id=${id}&name=${name}`;
+    }
+
+    left_button.setAttribute('href', prevPageUrl);
+    right_button.setAttribute('href', nextPageUrl);
 
     if (isUndefind(data.first, data.last)) {
         left_button.removeAttribute('href');
