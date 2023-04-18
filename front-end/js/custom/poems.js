@@ -2,7 +2,7 @@ import * as lib from "./methods.js";
 import * as pag  from "./pagination.js";
 
 
-const page = pag.getPage();
+let page = pag.getPage();
 const SIZE_OF_PAGE = pag.SIZE_OF_PAGE;
 
 const poems = document.querySelector(".poems");
@@ -23,6 +23,7 @@ loadData();
 
 find_button.addEventListener('click', async () => {
     let value = find_field.value;
+    page = 0;
     poems.innerHTML = getLoadingBlock();
     loadData(value);     
 });
@@ -32,7 +33,7 @@ async function loadData(value ='') {
     poems.innerHTML = loadingDataForInnering;
     const requestUrl = makeRequestForSubscriptions(value);
     const allData = await getData(requestUrl);
-    pag.setCorrectSettingForPagination(allData,page,'poems.html',getDataParam());
+    pag.setCorrectSettingForPagination(allData,page,'poems.html',getDataParam(),getIdParam(),getNameParam());
     addData(allData);    
     updateLikes(allData.content);  
 }
@@ -95,6 +96,21 @@ function addData(data) {
 }
 
 
+const title = document.querySelector('.t-title');
+
+function innerTitle() {
+  let dataParam = getDataParam();
+  let authorId = getIdParam();
+  let name = getNameParam();
+  if (dataParam == 'likes')
+    title.textContent = 'Вподобані вірші';
+  else if (authorId != null)
+    title.textContent = name;
+  else
+    title.textContent = 'Всі вірші';
+}
+
+
 function innerPoems(data) { 
   for (let i = 0; i < data.length; i++) {
   var div = document.createElement("div");
@@ -141,20 +157,6 @@ function innerPoems(data) {
   }
 }
 
-
-const title = document.querySelector('.t-title');
-
-function innerTitle() {
-  let dataParam = getDataParam();
-  let authorId = getIdParam();
-  let name = getNameParam();
-  if (dataParam == 'likes')
-    title.textContent = 'Вподобані вірші';
-  else if (authorId != null)
-    title.textContent = name;
-  else
-    title.textContent = 'Всі вірші';
-}
 
 
 
