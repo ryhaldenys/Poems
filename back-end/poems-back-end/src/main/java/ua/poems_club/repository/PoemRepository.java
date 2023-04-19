@@ -14,6 +14,7 @@ import ua.poems_club.model.Poem;
 
 import java.util.Optional;
 
+
 public interface PoemRepository extends JpaRepository<Poem,Long> {
 
     @Query("select new ua.poems_club.dto.poem.PoemsDto(p.id,p.name,p.text,a.id,p.status,a.fullName,count(l)," +
