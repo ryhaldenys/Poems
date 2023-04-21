@@ -71,4 +71,14 @@ function addData(data) {
             <div class="description">
               ${description}
             </div>`
+    
+    addMetaDescription(data.fullName);
+}
+
+
+function addMetaDescription(name) { 
+     const metaDescriptionTag = document.querySelector('meta[name="description"]');
+    metaDescriptionTag.setAttribute('content', `Дивіться творчі вірші та поезії користувача ${name}. 
+    Долучайтесь до спільноти творчих людей 
+    та поділіться своїми віршами зі світом. Реєструйтесь зараз та створіть свій власний профіль.`);
 }
