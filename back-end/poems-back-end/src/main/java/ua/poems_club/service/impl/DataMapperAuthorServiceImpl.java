@@ -36,7 +36,7 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
 
 
     @Override
-    @Cacheable(value = "authors",key = "#authorName + '_' + #pageable.pageNumber")
+    @Cacheable(value = "authors",key = "#currentAuthorId +'_'+#authorName + '_' + #pageable.pageNumber")
     public Page<AuthorsDto> getAllAuthors(Long currentAuthorId,String authorName,Pageable pageable) {
         var authors = getAuthors(currentAuthorId, authorName, pageable);
         setImagePathForAll(authors);
