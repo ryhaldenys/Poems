@@ -35,4 +35,16 @@ function innerData(data) {
         </div>`;
 
     main_container.innerHTML = page;
+    innerTitle(data.name);
+    addMetaDescription(data);
+}
+
+function innerTitle(name) { 
+    const title = document.querySelector('title');
+    title.innerText = name;
+}
+
+function addMetaDescription(data) { 
+     const metaDescriptionTag = document.querySelector('meta[name="description"]');
+    metaDescriptionTag.setAttribute('content', `Прочитайте вірш "${data.name}" від автора ${data.authorName}.`);
 }
