@@ -7,6 +7,7 @@ import ua.poems_club.dto.exception.ErrorResponse;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
 import ua.poems_club.exception.NotFoundException;
+import ua.poems_club.security.exception.JwtAuthenticationException;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -35,5 +36,11 @@ public class ControllerAdvice {
     public ResponseEntity<?> handleAuthenticationException(AuthenticationException e){
         return ResponseEntity.status(FORBIDDEN)
                 .body(new ErrorResponse("Invalid email/password combination"));
+    }
+
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<?> handleJwtAuthenticationException(JwtAuthenticationException e){
+        return ResponseEntity.status(FORBIDDEN)
+                .body(new ErrorResponse("JWT token is expired or invalid"));
     }
 }
