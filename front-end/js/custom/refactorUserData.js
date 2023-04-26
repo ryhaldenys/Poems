@@ -24,6 +24,7 @@ updateDataButton.addEventListener('click', async () => {
                 .then(content => content)
                 .catch(error => error);
                 localStorage.setItem('token', response.token);
+                window.location = 'account.html';
         }
         })
     }
