@@ -2,6 +2,7 @@ const requestURL = 'https://poems-back-end-app.herokuapp.com/api/poems?page=0&si
 
 import * as lib  from "./methods.js";
 
+console.log(localStorage.getItem('token'));
 
 let content = await lib.sendRequest('GET', requestURL)
   .then(data => data.content)
