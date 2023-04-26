@@ -1,10 +1,10 @@
 import * as lib  from "./methods.js";
 import * as pag  from "./pagination.js";
 
-const page = pag.getPage();
+let page = pag.getPage();
 const SIZE_OF_PAGE = pag.SIZE_OF_PAGE;
 const halfOfRequest = 'https://poems-back-end-app.herokuapp.com/api/authors';
-const pageableParameters = `?page=${page}&size=${SIZE_OF_PAGE}`;
+let pageableParameters = `?page=${page}&size=${SIZE_OF_PAGE}`;
 const userId = localStorage.getItem('id');
 
 
@@ -15,7 +15,7 @@ const find_button = document.querySelector('.find');
 
 checkIsAuthorithation();
 
-function checkIsAuthorithation() { 
+function checkIsAuthorithation() {
   if (localStorage.getItem('token') == null)
     window.location = 'index.html';
 }
@@ -26,6 +26,8 @@ loadData();
 
 find_button.addEventListener('click', async () => {
     let value = find_field.value;
+    page = 0;
+    pageableParameters = `?page=${page}&size=${SIZE_OF_PAGE}`;
     main_content.innerHTML = getLoadingBlock();
 
     loadData(value);
