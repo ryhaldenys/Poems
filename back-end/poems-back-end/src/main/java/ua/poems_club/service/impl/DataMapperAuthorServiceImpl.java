@@ -11,25 +11,24 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.dto.author.*;
 import ua.poems_club.dto.poem.PoemsDto;
 
+import ua.poems_club.exception.ImageNotFoundException;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.repository.PoemRepository;
 
-import ua.poems_club.service.AmazonImageService;
 import ua.poems_club.service.DataMapperAuthorService;
-
-import java.util.Objects;
+import ua.poems_club.service.ImageService;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     private final AuthorRepository authorRepository;
-    private final AmazonImageService amazonImageService;
+    private final ImageService imageService;
 
-    @Value("${DEFAULT_IMG_NAME}")
+    @Value("${DEFAULT_IMAGE}")
     private String defaultImage;
 
     private final PoemRepository poemRepository;
@@ -81,20 +80,23 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
     }
 
     private void setImagePath(AuthorsDto author){
-        if (Objects.isNull(author.getImagePath())) {
-            var imageUrl = amazonImageService.getImage(defaultImage);
-            author.setImagePath(imageUrl);
-        }else {
-            var imageUrl = amazonImageService.getImage(author.getImagePath());
-            author.setImagePath(imageUrl);
+        try {
+           setImage(author.getImagePath(),author);
+        }catch (ImageNotFoundException e){
+            setImage(defaultImage,author);
         }
+    }
+
+    private void setImage(String imageName,AuthorsDto author) {
+        var image = imageService.getImage(imageName);
+        author.setImagePath(image);
     }
 
     @Override
     @Cacheable(value = "author",key = "#id")
     public AuthorDto getAuthorById(Long id) {
         var author = getById(id);
-        setImagePath(author);
+        setImagePathForAuthorDto(author);
         return author;
     }
 
@@ -103,8 +105,16 @@ public class DataMapperAuthorServiceImpl implements DataMapperAuthorService {
                 orElseThrow(()->throwNotFoundAuthorById(id));
     }
 
-    private void setImagePath(AuthorDto author) {
-        author.setImagePath(amazonImageService.getImage(author.getImagePath()));
+    private void setImagePathForAuthorDto(AuthorDto author){
+        try {
+            setImageForAuthorDto(author.getImagePath(),author);
+        }catch (ImageNotFoundException e){
+            setImageForAuthorDto(defaultImage,author);
+        }
+    }
+    private void setImageForAuthorDto(String imageName, AuthorDto author){
+        var image = imageService.getImage(imageName);
+        author.setImagePath(image);
     }
 
 
