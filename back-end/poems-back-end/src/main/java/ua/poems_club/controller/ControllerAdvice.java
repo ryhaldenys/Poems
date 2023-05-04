@@ -4,9 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ua.poems_club.dto.exception.ErrorResponse;
-import ua.poems_club.exception.AuthorAlreadyExist;
-import ua.poems_club.exception.IncorrectAuthorDetailsException;
-import ua.poems_club.exception.NotFoundException;
+import ua.poems_club.exception.*;
 import ua.poems_club.security.exception.JwtAuthenticationException;
 
 import static org.springframework.http.HttpStatus.*;
@@ -42,5 +40,17 @@ public class ControllerAdvice {
     public ResponseEntity<?> handleJwtAuthenticationException(JwtAuthenticationException e){
         return ResponseEntity.status(FORBIDDEN)
                 .body(new ErrorResponse("JWT token is expired or invalid"));
+    }
+
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ResponseEntity<?> handleImageNotFoundException(ImageNotFoundException e){
+        return ResponseEntity.status(NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidImageException.class)
+    public ResponseEntity<?> handleInvalidImageException(InvalidImageException e){
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
     }
 }
