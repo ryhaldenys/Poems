@@ -9,10 +9,12 @@ export async function sendRequest(method, url, body = null) {
   }).then(response => {
     if (response.ok)
       return response.json()
-    else if(response.status === 404) {
+    else if (response.status === 404) {
       return Promise.reject(response.json());
     } else {
-      const e = new Error('Something went wrong! Status: '+response.status);
+      localStorage.clear();
+      window.location ='index.html';
+      const e = new Error('Something went wrong! Status: ' + response.status);
       throw e;
     }
   })

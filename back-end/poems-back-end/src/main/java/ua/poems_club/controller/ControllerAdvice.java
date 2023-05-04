@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ua.poems_club.dto.exception.ErrorResponse;
+
 import ua.poems_club.exception.*;
 import ua.poems_club.security.exception.JwtAuthenticationException;
 
@@ -52,5 +53,5 @@ public class ControllerAdvice {
     public ResponseEntity<?> handleInvalidImageException(InvalidImageException e){
         return ResponseEntity.status(BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
-    }
+   }
 }
