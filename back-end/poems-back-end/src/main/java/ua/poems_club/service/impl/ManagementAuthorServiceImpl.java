@@ -13,13 +13,13 @@ import ua.poems_club.dto.author.PasswordDto;
 import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
-import ua.poems_club.exception.InvalidImagePathException;
+import ua.poems_club.exception.InvalidImageException;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
 import ua.poems_club.security.dto.RegistrationRequestDto;
-import ua.poems_club.service.AmazonImageService;
+import ua.poems_club.service.ImageService;
 import ua.poems_club.service.ManagementAuthorService;
 
 import java.io.IOException;
@@ -32,9 +32,9 @@ import java.util.UUID;
 public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     private final AuthorRepository authorRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final AmazonImageService amazonImageService;
+    private final ImageService imageService;
 
-    @Value("${DEFAULT_IMG_NAME}")
+    @Value("${DEFAULT_IMAGE}")
     private String defaultImage;
 
     @Override
@@ -174,7 +174,7 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     private void deleteAuthorImage(Author author) {
         var image =author.getImageName();
         if (!image.equals(defaultImage))
-            amazonImageService.deleteImage(image);
+            imageService.removeImage(image);
     }
 
     private Author getAuthorFetchAllFields(Long id){
@@ -236,20 +236,20 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
             setNewImageToAuthor(author,fileName);
 
         } catch (IOException e) {
-            throw new InvalidImagePathException("Invalid image path");
-        }
-    }
-
-    private void deleteOldImageIfItExist(Author author) throws IOException {
-        var imageName = author.getImageName();
-        if (!imageName.equals(defaultImage)){
-            amazonImageService.deleteImage(imageName);
+            throw new InvalidImageException("Invalid image path");
         }
     }
 
     private void checkIsImagePathNotNull(MultipartFile multipartFile){
         if(multipartFile == null)
-            throw new InvalidImagePathException("Gotten file is invalid");
+            throw new InvalidImageException("Gotten file is invalid");
+    }
+
+    private void deleteOldImageIfItExist(Author author) throws IOException {
+        var imageName = author.getImageName();
+        if (!imageName.equals(defaultImage)){
+            imageService.removeImage(imageName);
+        }
     }
 
     private String generateUniqueFileName(MultipartFile multipartFile){
@@ -258,7 +258,7 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
     }
 
     private void saveImage(MultipartFile multipartFile, String fileName) throws IOException {
-        amazonImageService.saveImage(fileName, multipartFile);
+        imageService.uploadImage(multipartFile,fileName);
     }
 
     private void setNewImageToAuthor(Author author,String fileName) {
@@ -330,7 +330,7 @@ public class ManagementAuthorServiceImpl implements ManagementAuthorService {
             deleteOldImageIfItExist(author);
             setDefaultImageName(author);
         } catch (IOException e) {
-            throw new InvalidImagePathException("Invalid image path");
+            throw new InvalidImageException("Invalid image path");
         }
     }
 

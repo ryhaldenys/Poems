@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.dto.poem.RequestPoemDto;
@@ -48,7 +48,7 @@ public class AuthorPoemServiceTest {
     void getAllPublicPoemsByAuthorIdTest(){
         var author = authors.get(0);
         var poemName = author.getPoems().get(0).getName();
-        var foundPoems = authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(author.getId(), currentUser.getId(),poemName, Pageable.unpaged()).getContent();
+        var foundPoems = authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(author.getId(), currentUser.getId(), poemName, PageRequest.of(0,10)).getContent();
 
         assertThat(foundPoems.get(0).getId()).isEqualTo(author.getPoems().get(0).getId());
         assertThat(foundPoems.get(0).getAmountLikes()).isEqualTo(1L);
@@ -58,7 +58,7 @@ public class AuthorPoemServiceTest {
     @Test
     void getAllPublicPoemsByWrongAuthorIdTest(){
 
-        assertThatThrownBy(()->authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(1000L, currentUser.getId(), " ",Pageable.unpaged()))
+        assertThatThrownBy(()->authorPoemService.getAllPublicPoemsByAuthorIdAndContainText(1000L, currentUser.getId(), " ",PageRequest.of(0,10)))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -66,7 +66,7 @@ public class AuthorPoemServiceTest {
     @Test
     void getAllPoemsByAuthorIdTest(){
         var author = authors.get(1);
-        var foundPoems = authorPoemService.getAllPoemsByAuthorId(author.getId(),currentUser.getId(), Pageable.unpaged()).getContent();
+        var foundPoems = authorPoemService.getAllPoemsByAuthorId(author.getId(),currentUser.getId(), PageRequest.of(0,10)).getContent();
 
         assertThat(foundPoems.get(0).getId()).isEqualTo(author.getPoems().get(0).getId());
         assertThat(foundPoems.get(0).isLike()).isTrue();
@@ -75,7 +75,7 @@ public class AuthorPoemServiceTest {
 
     @Test
     void getAllPoemsByWrongAuthorIdTest(){
-        assertThatThrownBy(()->authorPoemService.getAllPoemsByAuthorId(1000L, currentUser.getId(), Pageable.unpaged()))
+        assertThatThrownBy(()->authorPoemService.getAllPoemsByAuthorId(1000L, currentUser.getId(), PageRequest.of(0,10)))
                 .isInstanceOf(NotFoundException.class);
     }
 

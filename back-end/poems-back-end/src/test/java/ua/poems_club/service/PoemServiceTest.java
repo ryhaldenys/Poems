@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ua.poems_club.dto.poem.PoemsDto;
@@ -16,7 +15,6 @@ import ua.poems_club.generator.PoemGenerator;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
 import ua.poems_club.repository.AuthorRepository;
-import ua.poems_club.repository.PoemRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +44,7 @@ public class PoemServiceTest {
 
     @Test
     void getAllPoems(){
-        var foundPoems = poemService.getAllPoems(currentUser.getId(), Pageable.unpaged(),"").getContent();
+        var foundPoems = poemService.getAllPoems(currentUser.getId(), PageRequest.of(0,10),"").getContent();
         List<PoemsDto> poemsDtos = mapToPoemsDto(currentUser, poems);
 
         assertThat(foundPoems).isEqualTo(poemsDtos);
@@ -67,7 +65,7 @@ public class PoemServiceTest {
     @Test
     void getAllPoemsFromEmptyDb(){
         authorRepository.deleteAll();
-        assertThatThrownBy(()->poemService.getAllPoems(currentUser.getId(), Pageable.unpaged(),""))
+        assertThatThrownBy(()->poemService.getAllPoems(currentUser.getId(), PageRequest.of(0,10),""))
                 .isInstanceOf(NotFoundException.class);
     }
 

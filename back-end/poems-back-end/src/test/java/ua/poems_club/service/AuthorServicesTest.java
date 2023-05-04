@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,7 +17,7 @@ import ua.poems_club.dto.author.PasswordDto;
 import ua.poems_club.dto.author.UpdateAuthorDto;
 import ua.poems_club.exception.AuthorAlreadyExist;
 import ua.poems_club.exception.IncorrectAuthorDetailsException;
-import ua.poems_club.exception.InvalidImagePathException;
+import ua.poems_club.exception.InvalidImageException;
 import ua.poems_club.exception.NotFoundException;
 import ua.poems_club.model.Author;
 import ua.poems_club.model.Poem;
@@ -41,7 +41,7 @@ public class AuthorServicesTest {
     @Autowired
     private DataMapperAuthorService gettingDataAuthorService;
     @Autowired
-    private AmazonImageService amazonImageService;
+    private ImageService imageService;
     @Autowired
     private ManagementAuthorService managementAuthorService;
 
@@ -53,7 +53,7 @@ public class AuthorServicesTest {
     private List<Author> authors;
     private List<Poem> poems;
 
-    @Value("${default.image}")
+    @Value("${DEFAULT_IMAGE}")
     private String defaultName;
 
     @BeforeEach
@@ -64,7 +64,7 @@ public class AuthorServicesTest {
     @Test
     void getAllAuthorsFromEmptyTableTest(){
         authorRepository.deleteAll();
-        var pageable = Pageable.unpaged();
+        var pageable = PageRequest.of(0,10);
         assertThatException()
                 .isThrownBy(()-> gettingDataAuthorService.getAllAuthors(1L,"",pageable));
 
@@ -74,7 +74,7 @@ public class AuthorServicesTest {
     void getAllAuthorsTest(){
         var author = authors.get(0);
         var currentUser = authors.get(1).getId();
-        var pageable = Pageable.unpaged();
+        var pageable = PageRequest.of(0,10);
         var authors = gettingDataAuthorService.getAllAuthors(currentUser,"",pageable).getContent();
 
         assertThat(authors.get(0).getId()).isEqualTo(author.getId());
@@ -243,7 +243,7 @@ public class AuthorServicesTest {
         var foundAuthor = authorRepository.findById(author.getId()).orElseThrow();
 
         assertThat(foundAuthor.getImageName().contains("hello.png")).isTrue();
-        amazonImageService.deleteImage(foundAuthor.getImageName());
+        imageService.removeImage(foundAuthor.getImageName());
 
     }
 
@@ -254,7 +254,7 @@ public class AuthorServicesTest {
         var author = authors.get(2);
 
         assertThatThrownBy(()-> managementAuthorService.addAuthorImage(author.getId(), null))
-                .isInstanceOf(InvalidImagePathException.class);
+                .isInstanceOf(InvalidImageException.class);
 
     }
 
@@ -307,7 +307,7 @@ public class AuthorServicesTest {
         var author = authors.get(0);
 
         var subscriptions = gettingDataAuthorService
-                .getAuthorSubscriptions(author.getId(),"",Pageable.unpaged())
+                .getAuthorSubscriptions(author.getId(),"",PageRequest.of(0,10))
                 .getContent();
 
         var firstAuthorSubscription = authors.get(1);
@@ -326,7 +326,7 @@ public class AuthorServicesTest {
         var author = authors.get(1);
 
         var subscribers = gettingDataAuthorService
-                .getAuthorSubscribers(author.getId(),"",Pageable.unpaged())
+                .getAuthorSubscribers(author.getId(),"",PageRequest.of(0,10))
                 .getContent();
 
         var subscriber = authors.get(0);
@@ -340,7 +340,7 @@ public class AuthorServicesTest {
         var author = authors.get(0);
 
         var likes = gettingDataAuthorService
-                .getAuthorLikes(author.getId(),"",Pageable.unpaged())
+                .getAuthorLikes(author.getId(),"",PageRequest.of(0,10))
                 .getContent();
 
         assertThat(likes.get(0).getName())
