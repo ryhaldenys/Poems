@@ -12,7 +12,7 @@ import java.util.Objects;
 public class CacheEvictScheduler {
     private final CacheManager cacheManager;
 
-    @Scheduled(fixedRate = 4200)
+    @Scheduled(fixedRate = 420_000)
     public void evictAllCache(){
         cacheManager.getCacheNames()
                 .forEach(c -> Objects.requireNonNull(cacheManager.getCache(c)).clear());
