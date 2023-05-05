@@ -30,7 +30,7 @@ Created by Denys Ryhal
   <br>
   <li>Front-end part is created using JavaScript, HTML, and CSS;</li>
   <br>
-  <li>Image storage - Amazon Server.</li>
+  <li>Image storage - Google Cloud Storage.</li>
 </ul>
 
 <br><br>
