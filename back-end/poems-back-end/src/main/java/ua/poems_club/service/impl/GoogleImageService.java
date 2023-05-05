@@ -57,7 +57,7 @@ public class GoogleImageService implements ImageService {
 
     @Override
     public String getImage(String imageName) {
-        var blob = BlobInfo.newBuilder(BlobId.of(bucketName,imageName)).build(); //createBlob(imageName);
+        var blob = createBlob(imageName);
         checkBlobIsNotNull(blob);
         return googleStorage.signUrl(blob,duration,unit, Storage.SignUrlOption.withV4Signature()).toString();
     }
@@ -66,7 +66,7 @@ public class GoogleImageService implements ImageService {
         return googleStorage.get(getBlobId(imageName));
     }
 
-    private void checkBlobIsNotNull(BlobInfo blob){
+    private void checkBlobIsNotNull(Blob blob){
         if (Objects.isNull(blob))
             throw new ImageNotFoundException("User image is not found");
     }
