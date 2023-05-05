@@ -59,7 +59,7 @@ public class GoogleImageService implements ImageService {
     public String getImage(String imageName) {
         var blob = createBlob(imageName);
         checkBlobIsNotNull(blob);
-        return blob.signUrl(duration,unit, Storage.SignUrlOption.withV4Signature()).toString();
+        return googleStorage.signUrl(blob,duration,unit, Storage.SignUrlOption.withV4Signature()).toString();
     }
 
     private Blob createBlob(String imageName){
