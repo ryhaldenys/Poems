@@ -231,6 +231,7 @@ public class AuthorPoemControllerTest {
         BDDMockito.willThrow(NotFoundException.class).given(service)
                         .updatePoemLikes(anyLong(),anyLong());
 
+
         mockMvc.perform(patch("/api/authors/1/poems/1/likes")
                         .contentType(APPLICATION_JSON)
                         .with(csrf())
