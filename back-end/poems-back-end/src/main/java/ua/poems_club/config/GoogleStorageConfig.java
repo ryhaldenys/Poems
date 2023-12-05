@@ -19,6 +19,9 @@ public class GoogleStorageConfig {
     @Value("${GOOGLE_CREDENTIALS}")
     private String credentials;
 
+    @Value("${PROJECT_ID}")
+    private String projectId;
+
     @Bean
     public Storage getStorage(){
         var googleCredentials = getGoogleCredentialOrElseThrowsException();
@@ -45,7 +48,7 @@ public class GoogleStorageConfig {
     private StorageOptions createStorageOptions(GoogleCredentials credentials){
         return StorageOptions.newBuilder()
                 .setCredentials(credentials)
-                .setProjectId("poems-club-385716")
+                .setProjectId(projectId)
                 .build();
     }
 
